@@ -7,7 +7,7 @@
 /windconsumer
 /PluginTemplateLegacy
 /dsmmanager
-/helloworld
+# /helloworld
 /plugintemplate-compose  smsservice
 /windprovider
 /action-bar-demo
