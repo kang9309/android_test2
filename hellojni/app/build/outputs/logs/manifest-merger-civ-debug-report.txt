@@ -1,0 +1,69 @@
+-- Merging decision tree log ---
+meta-data#plugin-api
+INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:11:9-81
+	android:value
+		INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:11:46-79
+	android:name
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:11:20-45
+manifest
+ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:1:1-27:12
+INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:1:1-27:12
+INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:1:1-27:12
+INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:1:1-27:12
+	package
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:3:5-50
+		INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml
+	xmlns:tools
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:2:5-51
+	android:versionCode
+		INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:1:11-69
+application
+ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:5:5-25:19
+INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:5:5-25:19
+	android:extractNativeLibs
+		INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml
+	android:label
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:8:9-41
+	android:icon
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:7:9-45
+	android:allowBackup
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:6:9-36
+	android:description
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:9:9-47
+	android:theme
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:10:9-40
+meta-data#app_desc
+ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:12:9-78
+	android:value
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:12:44-76
+	android:name
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:12:20-43
+activity#com.atakmap.app.component
+ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:16:8-22:19
+	android:exported
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:17:12-35
+	tools:ignore
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:18:12-39
+	android:name
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:16:18-58
+intent-filter#action:name:com.atakmap.app.component
+ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:19:12-21:28
+	android:label
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:19:27-59
+action#com.atakmap.app.component
+ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:20:15-66
+	android:name
+		ADDED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:20:23-63
+uses-sdk
+INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml
+INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml

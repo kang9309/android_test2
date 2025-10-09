@@ -1,7 +1,7 @@
 #sample app
 /MetricsApi
 /customtiles
-/hellojni
+# /hellojni
 /plugintemplate
 /sensortester
 /windconsumer

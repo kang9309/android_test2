@@ -1,0 +1,54 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.atakmap.android.hellojni.plugin"
+4    android:versionCode="1760032916"
+5    android:versionName="1.0 (038dfbed) - [5.5.0]" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="34" />
+10
+11    <application
+11-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:5:5-25:19
+12        android:allowBackup="false"
+12-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:6:9-36
+13        android:debuggable="true"
+14        android:description="@string/app_desc"
+14-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:9:9-47
+15        android:extractNativeLibs="true"
+16        android:icon="@drawable/ic_launcher"
+16-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:7:9-45
+17        android:label="@string/app_name"
+17-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:8:9-41
+18        android:theme="@style/AppTheme" >
+18-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:10:9-40
+19        <meta-data
+20            android:name="plugin-api"
+20-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:11:20-45
+21            android:value="com.atakmap.app@5.5.0.CIV" />
+21-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:11:46-79
+22        <meta-data
+22-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:12:9-78
+23            android:name="app_desc"
+23-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:12:20-43
+24            android:value="@string/app_desc" />
+24-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:12:44-76
+25
+26        <!-- allow for plugin discovery -->
+27        <activity
+27-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:16:8-22:19
+28            android:name="com.atakmap.app.component"
+28-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:16:18-58
+29            android:exported="true" >
+29-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:17:12-35
+30            <intent-filter android:label="@string/app_name" >
+30-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:19:12-21:28
+30-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:19:27-59
+31                <action android:name="com.atakmap.app.component" />
+31-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:20:15-66
+31-->E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\AndroidManifest.xml:20:23-63
+32            </intent-filter>
+33        </activity>
+34    </application>
+35
+36</manifest>

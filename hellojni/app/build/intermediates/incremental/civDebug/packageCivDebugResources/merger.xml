@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="main" generated-set="main$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res"><file name="btn_gray" path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res\drawable\btn_gray.xml" qualifiers="" type="drawable"/><file name="ic_launcher" path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res\drawable\ic_launcher.png" qualifiers="" type="drawable"/><file name="new_dark_button_bg" path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res\drawable\new_dark_button_bg.xml" qualifiers="" type="drawable"/><file name="new_dark_button_disabled" path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res\drawable\new_dark_button_disabled.xml" qualifiers="" type="drawable"/><file name="new_dark_button_selected" path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res\drawable\new_dark_button_selected.xml" qualifiers="" type="drawable"/><file path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res\values\color.xml" qualifiers=""><color name="white">#ffffff</color><color name="darker_gray">#121212</color></file><file path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res\values\dimen.xml" qualifiers=""><dimen name="fontSize">14sp</dimen></file><file path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res\values\strings.xml" qualifiers=""><string name="app_name">Hello JNI Tool</string><string name="hello_world">Hello JNI</string><string name="app_desc">Hello JNI Plugin</string></file><file path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res\values\styles.xml" qualifiers=""><style name="ATAKPluginTheme" parent="@android:style/Theme.Holo">
+        <item name="android:buttonStyle">@android:style/Widget.Button</item>
+        <item name="android:imageButtonStyle">@android:style/Widget.Button</item>
+        <item name="android:buttonStyleToggle">@android:style/Widget.Button</item>
+        <item name="android:spinnerStyle">@style/ATAKSpinner</item>
+        <item name="android:spinnerItemStyle">@style/ATAKSpinnerItem</item>
+        <item name="android:editTextStyle">@style/ATAKEditText</item>
+    </style><style name="ATAKTheme" parent="@android:style/Theme.Holo">
+
+        
+        <item name="android:buttonStyle">@android:style/Widget.Button</item>
+        <item name="android:imageButtonStyle">@android:style/Widget.Button</item>
+        <item name="android:buttonStyleToggle">@android:style/Widget.Button</item>
+        <item name="android:spinnerStyle">@style/ATAKSpinner</item>
+        <item name="android:spinnerItemStyle">@style/ATAKSpinnerItem</item>
+
+        <item name="android:editTextStyle">@style/ATAKEditText</item>
+
+        
+        
+    </style><style name="AppBaseTheme" parent="android:Theme.Light">
+        
+    </style><style name="AppTheme" parent="@android:style/Theme.Holo">
+        <item name="android:buttonStyle">@android:style/Widget.Button</item>
+        <item name="android:imageButtonStyle">@android:style/Widget.Button</item>
+        <item name="android:buttonStyleToggle">@android:style/Widget.Button</item>
+        <item name="android:spinnerStyle">@style/ATAKSpinner</item>
+        <item name="android:spinnerItemStyle">@style/ATAKSpinnerItem</item>
+        <item name="android:editTextStyle">@style/ATAKEditText</item>
+    </style><style name="ATAKSpinner" parent="@android:style/Widget.Spinner">
+        <item name="android:spinnerMode">dialog</item>
+    </style><style name="ATAKEditText" parent="@android:style/Widget.EditText">
+        
+        
+
+        
+        <item name="android:imeOptions">flagNoFullscreen</item>
+    </style><style name="FullDropdownStyle" parent="@style/ATAKTheme">
+        <item name="android:buttonStyle">@style/unpaddedButton</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:imeOptions">flagNoExtractUi</item>
+    </style><style name="ATAKSpinnerItem" parent="@style/AppTheme">
+        <item name="android:textColor">@android:color/black</item>
+    </style><style name="unpaddedButton" parent="@android:style/Widget.Button">
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:textSize">@dimen/fontSize</item>
+    </style><style name="darkButton" parent="@android:style/Widget.Button">
+        <item name="android:background">@drawable/btn_gray</item>
+        <item name="android:shadowColor">@color/darker_gray</item>
+        <item name="android:shadowDy">1</item>
+        <item name="android:shadowRadius">2</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:textSize">@dimen/fontSize</item>
+    </style><style name="RadioTitle" parent="@android:style/TextAppearance.Medium">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:textSize">21sp</item>
+        <item name="android:textStyle">bold</item>
+    </style><style name="RadioSubTitle" parent="@android:style/TextAppearance.Small">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">normal</item>
+    </style><style name="RadioState" parent="@android:style/TextAppearance.Small">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">normal</item>
+    </style></file><file name="com_android_vending_archive_opt_out" path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res\xml\com_android_vending_archive_opt_out.xml" qualifiers="" type="xml"/></source></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="civ$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\civ\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="civ" generated-set="civ$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\civ\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\build-types\debug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="debug" generated-set="debug$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\build-types\debug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\build\generated\res\resValues\civ\debug"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="generated" generated-set="generated$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\build\generated\res\resValues\civ\debug"><file path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\build\generated\res\resValues\civ\debug\values\gradleResValues.xml" qualifiers=""><string name="versionName" translatable="false">1.0 (038dfbed) - [5.5.0]</string></file></source></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="variant$Generated" generated="true" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\civDebug\res"/></dataSet><dataSet aapt-namespace="http://schemas.android.com/apk/res-auto" config="variant" generated-set="variant$Generated" ignore_pattern="!.svn:!.git:!.ds_store:!*.scc:.*:&lt;dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~"><source path="E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\civDebug\res"/></dataSet><mergedItems/></merger>
