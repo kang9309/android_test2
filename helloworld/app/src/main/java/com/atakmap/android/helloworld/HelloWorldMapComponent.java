@@ -62,17 +62,26 @@ import com.atakmap.android.radiolibrary.RadioMapComponent;
 import com.atakmap.android.statesaver.StateSaverPublisher;
 import com.atakmap.android.user.FilterMapOverlay;
 import com.atakmap.android.user.geocode.GeocodeManager;
+//import com.atakmap.android.plugin.PluginManager;
+//import com.atakmap.android.plugin.PluginMessage;
 import com.atakmap.app.preferences.ToolsPreferenceFragment;
 import com.atakmap.comms.CommsMapComponent;
 import com.atakmap.coremap.concurrent.NamedThreadFactory;
 import com.atakmap.coremap.cot.event.CotDetail;
 import com.atakmap.coremap.cot.event.CotEvent;
+import com.atakmap.coremap.cot.event.CotPoint;
+
 import com.atakmap.coremap.log.Log;
 import com.atakmap.coremap.maps.coords.GeoBounds;
 import com.atakmap.coremap.maps.coords.GeoPoint;
+import com.atakmap.coremap.maps.time.CoordinatedTime;
+//import com.atakmap.coremap.cot.geo.CotPoint;
+
 import com.atakmap.net.AtakAuthenticationCredentials;
 import com.atakmap.net.AtakAuthenticationDatabase;
 import com.atakmap.net.DeviceProfileClient;
+
+
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -87,6 +96,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -94,6 +104,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+
 
 /**
  * This is an example of a MapComponent within the ATAK 
@@ -106,6 +118,16 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
     public static final String TAG = "HelloWorldMapComponent";
 
     private Context pluginContext;
+    // 1. Context를 저장할 private 멤버 변수 선언
+//    private Context context;
+    // 2. 생성자에서 Context를 전달받아 저장합니다.
+    // 플러그인 매니저가 이 클래스를 인스턴스화할 때 Context를 넘겨줍니다.
+//    public HelloWorldMapComponent(final Context context) {
+//        super(); // 부모 클래스의 기본 생성자 호출
+//    }
+
+    public static final String ACTION_TO_HELLOJNI = "com.myplugin.HELLOJNI_MESSAGE";
+
     private HelloWorldDropDownReceiver dropDown;
     private WebViewDropDownReceiver wvdropDown;
     private HelloWorldMapOverlay mapOverlay;
@@ -135,7 +157,9 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
     @Override
     public void onResume(final Context context,
             final MapView view) {
-        Log.d(TAG, "onResume");
+        Log.d(TAG, "ksh_test onResume");
+        sendTestMessageToHelloJNI("test");
+        Log.d(TAG, "onResume end");
     }
 
     @Override
@@ -143,6 +167,100 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
             final MapView view) {
         Log.d(TAG, "onStop");
     }
+
+    public void sendTestMessageToHelloJNI(String message) {
+        Log.d(TAG, "sendTestMessageToHelloJNI");
+        // 1. Intent 객체 생성 및 고유 Action 설정
+        Intent intent = new Intent(ACTION_TO_HELLOJNI);
+
+        // 2. 전송할 데이터를 Intent에 추가 (예: "payload" 키 사용)
+        intent.putExtra("payload", message);
+
+        // 3. AtakBroadcast를 사용하여 Intent 전송
+        // 'context'는 MapComponent가 초기화될 때 전달받은 유효한 Context여야 합니다.
+//        AtakBroadcast.getInstance().sendBroadcast(context, intent);
+        AtakBroadcast.getInstance().sendBroadcast(intent);
+
+        Log.d(TAG, "Broadcast Sent to hellojni: " + message);
+//        System.out.println("Broadcast Sent to hellojni: " + message);
+    }
+
+//    public void sendTestMessageToHelloJNI(String message) {
+//        // 1. 대상 플러그인의 UID 정의
+//        // 'hellojni' 플러그인이 메시지 리스너를 등록할 때 사용한 고유 ID를 사용해야 합니다.
+//        // 일반적으로 플러그인 이름(예: "HelloWorldPlugin", "hellojni")을 UID로 사용합니다.
+//        final String TARGET_PLUGIN_UID = "hellojni";
+//
+//        // 2. PluginMessage 객체 생성
+//        // 대상 UID와 전송할 String 데이터를 페이로드로 지정합니다.
+//        PluginMessage pluginMessage = new PluginMessage(TARGET_PLUGIN_UID, message);
+//
+//        // 3. PluginManager를 통해 메시지 송신
+//        // 이 메시지를 수신하려면 'hellojni' 플러그인이 TARGET_PLUGIN_UID로 리스너를 등록해야 합니다.
+//        PluginManager.getInstance().sendMessage(pluginMessage);
+//
+//        System.out.println("Message Sent to [" + TARGET_PLUGIN_UID + "]: " + message);
+//    }
+
+//    public void sendCotMessage(double lat, double lon) {
+//        try {
+//            // ✅ 고유 식별자 (UID)
+//            String uid = "plugin-helloworld-" + java.util.UUID.randomUUID();
+//
+//            // ✅ 시간 정보 설정
+//            com.atakmap.coremap.maps.time.CoordinatedTime now =
+//                    new com.atakmap.coremap.maps.time.CoordinatedTime();
+//            com.atakmap.coremap.maps.time.CoordinatedTime stale =
+//                    new com.atakmap.coremap.maps.time.CoordinatedTime(now.getMilliseconds() + 60_000);
+//
+//            // ✅ 지도 중심 좌표 가져오기 (또는 직접 lat/lon 사용)
+//            com.atakmap.android.maps.MapView mapView = com.atakmap.android.maps.MapView.getMapView();
+////            com.atakmap.coremap.maps.coords.GeoPoint gp = mapView.getCenterPoint().get();
+////
+////            // ※ 중심 좌표 대신 인자로 받은 lat/lon을 사용할 수도 있음
+////            com.atakmap.coremap.maps.coords.GeoPoint point =
+////                    new com.atakmap.coremap.maps.coords.GeoPoint(lat, lon, 0.0);
+//
+//            // 지도 중심 좌표 가져오기
+//            GeoPoint gp = mapView.getCenterPoint().get();
+//
+//            // CotPoint 객체 생성 (CotEvent 생성자용)
+//            CotPoint point = new CotPoint(gp);
+//
+//            // ✅ CoT 이벤트 생성
+//            // 기존 (에러 발생)
+////            com.atakmap.coremap.maps.CotEvent event = ...
+//
+//            // 변경
+//            com.atakmap.coremap.cot.event.CotEvent event =
+//                    new com.atakmap.coremap.cot.event.CotEvent(
+//                            uid,               // UID
+//                            "b-t-f",           // Type (Blue Force Friendly)
+//                            "m-g",             // How (machine-generated)
+//                            point,             // GeoPoint
+//                            now,               // start
+//                            stale,             // stale
+//                            now,               // how time
+//                            "HelloWorld",      // detail name
+//                            null,              // detail (null 가능)
+//                            "Hello World!",    // remarks
+//                            "plugin",          // creator group
+//                            "helloworld"       // creator name
+//                    );
+//
+//            // ✅ CoT 송신
+////            com.atakmap.android.cot.CotMapComponent.getInstance().sendCot(event);
+//            // sendCotMessage 사용
+////            com.atakmap.android.cot.CotMapComponent.getInstance().sendCotMessage(event);
+//            CotEventBus.getInstance(mapView).post(event);
+//
+//            android.util.Log.i("ATAK_HelloWorld", "📤 Sent CoT message: " + uid
+//                    + " (" + lat + ", " + lon + ")");
+//        } catch (Exception e) {
+//            android.util.Log.e("ATAK_HelloWorld", "sendCotMessage failed", e);
+//        }
+//    }
+
 
     /**
      * Simple uncalled example for how to import a file.
@@ -189,6 +307,9 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         context.setTheme(R.style.ATAKPluginTheme);
 
         super.onCreate(context, intent, view);
+        // ✅ [수정] onCreate()에서 Context를 전달받아 저장합니다.
+//        this.context = context;
+
         pluginContext = context;
 
         GLMapItemFactory.registerSpi(GLSpecialMarker.SPI);

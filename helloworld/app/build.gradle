@@ -271,6 +271,13 @@ dependencies {
         exclude module: 'customview'
     }
 
+//    // ====================================================================
+//    // 💡 필수 추가: ATAK 코어/플러그인 API 의존성을 추가합니다.
+//    // PluginManager와 같은 ATAK 핵심 클래스를 사용할 수 있게 합니다.
+//    // 'atak' 모듈이 모든 플러그인 API를 포함합니다.
+//    implementation "com.atakmap.app:atak:$ATAK_VERSION"
+//    // ====================================================================
+
     androidTestImplementation 'androidx.lifecycle:lifecycle-runtime:2.2.0'
 
 }
