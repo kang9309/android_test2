@@ -2,12 +2,14 @@
 /MetricsApi
 /customtiles
 # /hellojni
+hellojni/app/build/
 /plugintemplate
 /sensortester
 /windconsumer
 /PluginTemplateLegacy
 /dsmmanager
 # /helloworld
+helloworld/app/build/
 /plugintemplate-compose  smsservice
 /windprovider
 /action-bar-demo
@@ -28,3 +30,4 @@
 /plugintemplate-compose
 /sampledetailtester
 /smsservice
+*/build/

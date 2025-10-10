@@ -1,2 +1,0 @@
-E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\cpp\Android.mk
-E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\cpp\Application.mk

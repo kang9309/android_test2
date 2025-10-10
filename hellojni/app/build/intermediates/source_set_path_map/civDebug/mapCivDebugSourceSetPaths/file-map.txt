@@ -1,9 +1,0 @@
-com.atakmap.android.hellojni.plugin.app-debug-0 E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\build-types\debug\res
-com.atakmap.android.hellojni.plugin.app-civ-1 E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\build\generated\res\pngs\civ\debug
-com.atakmap.android.hellojni.plugin.app-civ-2 E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\build\generated\res\resValues\civ\debug
-com.atakmap.android.hellojni.plugin.app-packageCivDebugResources-3 E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\build\intermediates\incremental\civDebug\packageCivDebugResources\merged.dir
-com.atakmap.android.hellojni.plugin.app-packageCivDebugResources-4 E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\build\intermediates\incremental\civDebug\packageCivDebugResources\stripped.dir
-com.atakmap.android.hellojni.plugin.app-civDebug-5 E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\build\intermediates\merged_res\civDebug\mergeCivDebugResources
-com.atakmap.android.hellojni.plugin.app-civ-6 E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\civ\res
-com.atakmap.android.hellojni.plugin.app-civDebug-7 E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\civDebug\res
-com.atakmap.android.hellojni.plugin.app-main-8 E:\test\android2\ATAK-CIV-5.5.0.7-SDK\ATAK-CIV-5.5.0.7-SDK\samples\hellojni\app\src\main\res

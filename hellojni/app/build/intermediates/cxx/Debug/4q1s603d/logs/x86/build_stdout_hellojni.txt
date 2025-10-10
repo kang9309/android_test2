@@ -1,2 +1,0 @@
-[x86] Compile++      : hellojni <= hellojni.cpp
-[x86] SharedLibrary  : libhellojni.so
