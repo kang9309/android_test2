@@ -99,6 +99,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.UUID;
+import java.util.Collection;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -146,10 +147,13 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
 
     private AtakPreferences prefs;
     private AtakAuthenticationCredentials authenticationCredentials;
+    private CotDetailHandler typeHandler; // 새로 추가할 핸들러
+    private static final String CUSTOM_COT_TYPE = "a-f-G-U-C"; // 전송에 사용하는 CoT Type
+
 
     // HelloWorldMapComponent 클래스 내부
     private CotDetailHandler customDataHandler; // 필드 추가
-
+    private static final String PERSISTENT_MARKER_UID = "PLUGIN-CUSTOM-COMM-MARKER-FIXED-UID";
 
     @Override
     public void onStart(final Context context, final MapView view) {
@@ -341,11 +345,10 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
 
     }
 
-    // 이 함수를 플러그인의 적절한 클래스 (예: 메인 액티비티, 서비스) 내부에 정의하세요.
+    /**
+     * 커스텀 데이터를 CoT 이벤트에 담아 전송합니다.
+     */
     public void sendCustomDataCot(String text1, String text2) {
-        // CoT Event Type definition. Must be the same on the receiving end.
-        final String CUSTOM_COT_TYPE = "a-f-G-U-C"; // Using a valid Marker type for better internal routing
-        final String TAG = "CustomCotSender"; // Tag for logging
 
         // 1. Declare variables outside the try/catch block to extend their scope
         CotDetail cotDetailRoot = null;
@@ -353,13 +356,18 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         CotEvent cotEvent = null;
         CotDetail customDataContainer = null;
 
+        // CoT Event Type definition. Using a valid Marker type for better internal routing
+//        final String CUSTOM_COT_TYPE = "a-f-G-U-C";
+        final String TAG = "CustomCotSender";
+
         if (text1 == null || text2 == null) {
-            Log.w(TAG, "text1 or text2 is null. Data will not be sent.");
+            Log.w(TAG, "text1 또는 text2가 null입니다. 데이터를 보내지 않습니다.");
             return;
         }
 
         try {
-            String eventUid = "custom-data-" + UUID.randomUUID().toString();
+            // ** [핵심] 고정된 UID를 사용: 수신 단말이 이 UID 마커를 업데이트하도록 유도합니다. **
+            String eventUid = PERSISTENT_MARKER_UID;
 
             MapView mapView = MapView.getMapView();
             if (mapView == null) {
@@ -367,74 +375,72 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
                 return;
             }
 
-            GeoPoint geoPoint = new GeoPoint(30.0, -39.0, 0.0, GeoPoint.UNKNOWN, GeoPoint.UNKNOWN);
+            // 임시 마커 생성을 위한 위치 설정 (onCreate에서 설정한 위치와 동일)
+            GeoPoint geoPoint = new GeoPoint(34.0, -118.0, 0.0, GeoPoint.UNKNOWN, GeoPoint.UNKNOWN);
 
-            // tempMarker is defined here
             tempMarker = new Marker(geoPoint, eventUid);
             tempMarker.setType(CUSTOM_COT_TYPE);
             tempMarker.setMetaString("how", "m-g");
-            tempMarker.setMetaString("callsign", "CustomDataSender");
-            tempMarker.setVisible(false);
+            tempMarker.setMetaString("callsign", "CommChannelUpdater");
+            tempMarker.setVisible(true);
 
-            // cotEvent is defined here
             cotEvent = CotEventFactory.createCotEvent(tempMarker);
-
             cotEvent.setType(CUSTOM_COT_TYPE);
             cotEvent.setHow("m-g");
 
             // *******************************************************************
-            // ** 6. Manually constructing CotDetail **
+            // ** 6. Detail 구성: 커스텀 데이터를 XML 구조로 만듦 **
             // *******************************************************************
 
-            // text1 Detail
             CotDetail text1Detail = new CotDetail("text1");
             text1Detail.setAttribute("value", text1);
-
-            // text2 Detail
             CotDetail text2Detail = new CotDetail("text2");
             text2Detail.setAttribute("value", text2);
 
-            // customDataContainer is defined here (Tag: __custom_data)
+            // customDataContainer: <__custom_data>
             customDataContainer = new CotDetail("__custom_data");
             customDataContainer.addChild(text1Detail);
             customDataContainer.addChild(text2Detail);
 
-            // cotDetailRoot is defined here (Tag: detail)
+            // cotDetailRoot: <detail> (CoT 이벤트의 최종 Detail 루트)
             cotDetailRoot = new CotDetail("detail");
             cotDetailRoot.addChild(customDataContainer);
 
             // ********************************************************
-            // ** 7. Set final Detail object on CotEvent **
+            // ** 7. CotEvent에 최종 Detail 객체 설정 **
             // ********************************************************
             cotEvent.setDetail(cotDetailRoot);
 
             // ************************************************
-            // ** 8. Send CoT using Intent (Public API) **
+            // ** 8. CoT 전송: SEND_COT 인텐트 사용 (네트워크 브로드캐스트) **
             // ************************************************
             String cotXml = cotEvent.toString();
 
             if (cotXml != null) {
                 Intent cotIntent = new Intent("com.atakmap.android.maps.SEND_COT");
                 cotIntent.putExtra("data", cotXml);
-                // Broadcast the intent
                 AtakBroadcast.getInstance().sendBroadcast(cotIntent);
-                Log.d(TAG, "Custom CoT event sent: Type=" + CUSTOM_COT_TYPE + ", Text1='" + text1 + "', Text2='" + text2 + "'");
+
+                Log.d(TAG, "Custom CoT event sent: Type=" + CUSTOM_COT_TYPE + ", UID=" + eventUid + ", Text1='" + text1 + "', Text2='" + text2 + "'");
+
+                // =========================================================================
+                // *** [로그 2 - 송신측 확인] 전송하는 CoT XML 전체 출력 ***
+                // A 단말에서 이 로그를 통해 CoT XML에 <__custom_data> 태그가 있는지 확인합니다.
+                // =========================================================================
+                Log.d(TAG, "CoT XML Content (Debug): " + cotXml);
+                // =========================================================================
             }
         } catch (Exception e) {
             Log.e(TAG, "Failed to send custom CoT message", e);
         }
 
-        // --- 9. [CRITICAL ADDITION] Forced local dispatch for debugging ---
-        // This part is outside the try/catch block and is used to test the handler logic.
-
+        // --- 9. [강제 로컬 디스패치] 로컬 테스트용 로직 (통신 문제 진단 회피용) ---
         if (customDataHandler != null && tempMarker != null && cotEvent != null && customDataContainer != null) {
-            // NOTE: We pass customDataContainer, which represents the '__custom_data' detail,
-            // as the 'detail' argument to the handler.
 
             customDataHandler.toItemMetadata(
-                    tempMarker,           // MapItem item
-                    cotEvent,             // CotEvent event
-                    customDataContainer   // CotDetail detail: the __custom_data tag itself
+                    tempMarker,           // 생성된 임시 마커 (item)
+                    cotEvent,             // 생성된 CoT 이벤트 (event)
+                    customDataContainer   // <__custom_data> Detail 객체
             );
             Log.d(TAG, "Debug: Forced local dispatch complete. Check CustomDataHandler logs.");
         } else {
@@ -442,6 +448,56 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         }
     }
 
+    // ** [수정] 하위 그룹을 이름으로 찾는 유틸리티 메서드 (static으로 변경하여 컴파일 오류 해결) **
+    private static MapGroup findMapGroupByName(MapGroup parent, String name) {
+        if (parent == null || name == null) {
+            return null;
+        }
+        for (MapGroup group : parent.getChildGroups()) {
+            if (name.equals(group.getFriendlyName())) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * UID로 그룹 내 아이템을 찾는 안전한 메서드입니다.
+     * ATAK SDK 5.5.0.7의 MapGroup.getItems() 반환 타입 변경(MapItem[] -> Collection<MapItem>)에 대응하여 수정되었습니다.
+     */
+    private static MapItem findItemByUID(MapGroup group, String uid) {
+        if (group == null || uid == null) return null;
+
+        // MapGroup.getItems()는 이제 Collection<MapItem>을 반환합니다.
+        // ** [수정]: Collection<MapItem> 타입 사용 **
+        Collection<MapItem> items = group.getItems();
+        for (MapItem item : items) {
+            if (uid.equals(item.getUID())) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 디버깅을 위해 마커에 리스너를 추가합니다. CoT 수신 시 위치나 메타데이터가 업데이트되는지 확인합니다.
+     */
+    private void addMarkerListeners(Marker marker) {
+        // 1. Point Changed Listener (위치 변경 감지)
+        marker.addOnPointChangedListener(new PointMapItem.OnPointChangedListener() {
+            @Override
+            public void onPointChanged(PointMapItem item) {
+                // 이 로그가 찍히면 CoT가 ATAK 코어에 의해 성공적으로 처리되었다는 강력한 증거입니다.
+                Log.w(TAG, "!!! [POINT CHANGED] Marker " + item.getUID() + " position updated by ATAK core!");
+            }
+        });
+
+        // 2. Metadata/Property Changed Listener는 컴파일 오류로 인해 제거되었습니다.
+        // 핸들러가 호출되면 마커의 메타데이터가 변경되지만, ATAK SDK 버전에 맞는 일반적인 속성 변경 리스너를 찾을 수 없었습니다.
+        // 대신 CustomDataHandler 내부의 로그(!!! HANDLER INVOKED)에 의존합니다.
+
+        Log.d(TAG, "Attached Point Changed listener to marker: " + marker.getUID());
+    }
 
     @Override
     public void onCreate(final Context context, Intent intent,
@@ -458,115 +514,116 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
 
         pluginContext = context;
 
-        GLMapItemFactory.registerSpi(GLSpecialMarker.SPI);
+//        GLMapItemFactory.registerSpi(GLSpecialMarker.SPI);
+        // 다른 불필요한 핸들러 등록 제거 (혹시 모를 간섭 방지)
+        // GLMapItemFactory.registerSpi(GLSpecialMarker.SPI); // 이 부분도 제거하거나 주석 처리
 
-        // Register capability to handle detail tags that TAK does not 
-        // normally process.
-        CotDetailManager.getInstance().registerHandler(
-                "__special",
-                sdh = new SpecialDetailHandler());
+        // ************************************************
+        // ** 핵심: __custom_data 태그를 처리하는 핸들러만 등록 **
+        // ************************************************
+        customDataHandler = new CotDetailHandler("__custom_data") {
+            private final String TAG = "CustomDataHandler";
 
-        CotDetailManager.getInstance().registerHandler(
-                aaaDetailHandler = new CotDetailHandler("__aaa") {
-                    private final String TAG = "AAACotDetailHandler";
+            @Override
+            public CommsMapComponent.ImportResult toItemMetadata(
+                    MapItem item, CotEvent event, CotDetail detail) {
 
-                    @Override
-                    public CommsMapComponent.ImportResult toItemMetadata(
-                            MapItem item, CotEvent event, CotDetail detail) {
-                        Log.d(TAG, "detail received: " + detail + " in:  "
-                                + event);
-                        return CommsMapComponent.ImportResult.SUCCESS;
-                    }
+                Log.d(TAG, "CommsMapComponent.ImportResult toItemMetadata invoked.");
 
-                    @Override
-                    public boolean toCotDetail(MapItem item, CotEvent event,
-                            CotDetail root) {
-                        Log.d(TAG, "converting to cot detail from: "
-                                + item.getUID());
-                        return true;
-                    }
-                });
+                CotDetail text1Detail = detail.getFirstChildByName(0, "text1");
+                CotDetail text2Detail = detail.getFirstChildByName(0, "text2");
 
-        // __custom_data 태그를 처리하는 핸들러 등록
-// **수정: registerHandler(Handler) 오버로드를 사용하도록 변경**
-        CotDetailManager.getInstance().registerHandler(
-            // 변수에 할당하면서 CotDetailHandler 인스턴스를 registerHandler에 전달
-            customDataHandler = new CotDetailHandler("__custom_data") {
-                private final String TAG = "CustomDataHandler";
+                String text1 = text1Detail != null ? text1Detail.getAttribute("value") : "N/A";
+                String text2 = text2Detail != null ? text2Detail.getAttribute("value") : "N/A";
 
-                @Override
-                public CommsMapComponent.ImportResult toItemMetadata(
-                        MapItem item, CotEvent event, CotDetail detail) {
+                // ***************************************************************
+                // 4. [핵심 로그]: 추출된 데이터 확인
+                Log.d(TAG, "SUCCESS PARSING: Text1=" + text1 + ", Text2=" + text2);
+                // ***************************************************************
 
-                    Log.d(TAG, "CommsMapComponent.ImportResult toItemMetadata");
+                item.setMetaString("custom_text1", text1);
+                item.setMetaString("custom_text2", text2);
 
-                    // 2. CotDetail에서 자식 Detail을 찾습니다.
-                    // detail은 __custom_data Detail 자체입니다.
-                    CotDetail text1Detail = detail.getFirstChildByName(0, "text1");
-                    CotDetail text2Detail = detail.getFirstChildByName(0, "text2");
+                return CommsMapComponent.ImportResult.SUCCESS;
+            }
 
-                    // 3. 값 추출. (setAttribute("value", ...)로 저장했으므로 getAttribute("value") 사용)
-                    String text1 = text1Detail != null ? text1Detail.getAttribute("value") : "N/A (Missing text1)";
-                    String text2 = text2Detail != null ? text2Detail.getAttribute("value") : "N/A (Missing text2)";
+            @Override
+            public boolean toCotDetail(MapItem item, CotEvent event, CotDetail root) {
+                return true;
+            }
+        };
+        // ************************************************
+        // ** 2. Type-based Handler (라우팅 강제용 더미 핸들러) **
+        // ** -> ATAK이 해당 Type의 CoT를 처리하도록 유도합니다. **
+        // ************************************************
+        typeHandler = new CotDetailHandler(CUSTOM_COT_TYPE) {
+            private final String TAG = "TypeRouterHandler";
 
-                    // ***************************************************************
-                    // 4. [핵심 로그]: 추출된 데이터 확인
-                    Log.d(TAG, "SUCCESS PARSING: Text1=" + text1 + ", Text2=" + text2);
-                    // ***************************************************************
+            @Override
+            public CommsMapComponent.ImportResult toItemMetadata(
+                    MapItem item, CotEvent event, CotDetail detail) {
 
-                    // 5. 이 데이터를 MapItem의 메타데이터로 저장
-                    item.setMetaString("custom_text1", text1);
-                    item.setMetaString("custom_text2", text2);
+                // 이 핸들러는 단순 라우팅 역할만 하며, 실제 데이터 처리는 Detail 핸들러에게 맡깁니다.
+                Log.d(TAG, "Routing CoT update received for type: " + CUSTOM_COT_TYPE);
+                return CommsMapComponent.ImportResult.SUCCESS;
+            }
+
+            @Override
+            public boolean toCotDetail(MapItem item, CotEvent event, CotDetail root) {
+                return true;
+            }
+        };
+
+        // ************************************************
+        // ** 3. [FIX] 핸들러 등록 순서 변경 (Type Handler를 먼저 등록) **
+        // ************************************************
+        // 1. Type Handler 등록: ATAK 코어에 이 Type에 관심이 있음을 먼저 알립니다.
+        CotDetailManager.getInstance().registerHandler(typeHandler);
+        // 2. Detail Handler 등록: 실제 파싱 로직을 담당하는 핸들러를 등록합니다.
+        CotDetailManager.getInstance().registerHandler(customDataHandler);
+
+        MapView currentView = MapView.getMapView();
+        if (currentView != null) {
+
+            GeoPoint markerLoc = new GeoPoint(34.0, -118.0); // 캘리포니아 LA 근처
+            Marker commMarker = new Marker(markerLoc, PERSISTENT_MARKER_UID);
+            commMarker.setType("a-f-G-U-C");
+            commMarker.setMetaString("callsign", "CommChannelUpdater"); // 콜사인 변경
+            commMarker.setMetaString("how", "m-g"); // SA 메시지로 전송
+            commMarker.setVisible(true); // 지도에서 보이게 설정
+
+            MapGroup rootGroup = currentView.getRootGroup();
+
+            // **[수정] static 메서드를 사용하여 그룹 찾기**
+            MapGroup commGroup = findMapGroupByName(rootGroup, "Plugin Comm Group");
+
+            if (commGroup == null) {
+                commGroup = rootGroup.addGroup("Plugin Comm Group");
+            }
+
+            MapItem existingItem = findItemByUID(commGroup, PERSISTENT_MARKER_UID);
+
+            // 기존 마커가 있다면 업데이트하고, 없다면 새로 추가합니다.
+            // ** [수정]: findItemByUID를 사용하여 MapGroup API 오버로드 충돌 회피 **
+            if (existingItem == null) {
+                commGroup.addItem(commMarker);
+                Log.d(TAG, "Persistent Comm Marker added with UID: " + PERSISTENT_MARKER_UID);
+                existingItem = commMarker;
+            } else {
+                Log.d(TAG, "Persistent Comm Marker already exists.");
+            }
+
+            // -------------------------------------------------------------------
+            // ** [NEW FIX] Map Item Listener 추가 (핵심 진단 로직) **
+            // -------------------------------------------------------------------
+            if (existingItem instanceof Marker) {
+                addMarkerListeners((Marker) existingItem);
+            }
+        }
+
+        Log.d(TAG, "CustomDataHandler successfully registered.");
 
 
-                    return CommsMapComponent.ImportResult.SUCCESS;
-                }
-
-                @Override
-                public boolean toCotDetail(MapItem item, CotEvent event, CotDetail root) {
-                    return true;
-                }
-            });
-//        CotDetailManager.getInstance().registerHandler(
-//                new CotDetailHandler("__custom_data") {
-//                    private final String TAG = "CustomDataHandler";
-//
-//                    @Override
-//                    public CommsMapComponent.ImportResult toItemMetadata(
-//                            MapItem item, CotEvent event, CotDetail detail) {
-//                        Log.d(TAG, "CommsMapComponent.ImportResult toItemMetadata");
-//
-//                        // 1. 이벤트 타입 검사를 수정하거나 제거합니다.
-//                        // if (!event.getType().equals("a-f-G-E-V-customdata")) { // <-- 이 줄을
-////                        if (!event.getType().equals("a-f-G-U-C")) { // <-- 이 줄로 변경
-////                            return CommsMapComponent.ImportResult.SUCCESS;
-////                        }
-//
-//                        // 2. CotDetail에서 자식 Detail을 찾습니다. (이전 수정된 0 인자 유지)
-//                        CotDetail text1Detail = detail.getFirstChildByName(0, "text1");
-//                        CotDetail text2Detail = detail.getFirstChildByName(0, "text2");
-//
-//                        // 3. 값 추출.
-//                        String text1 = text1Detail != null ? text1Detail.getAttribute("value") : "N/A";
-//                        String text2 = text2Detail != null ? text2Detail.getAttribute("value") : "N/A";
-//
-//                        // 4. 로컬에서 원하는 동작 수행 (로그 출력)
-//                        Log.d(TAG, "Custom Data Received LOCALLY: Text1=" + text1 + ", Text2=" + text2);
-//
-//                        // 5. 이 데이터를 MapItem의 메타데이터로 저장
-//                        item.setMetaString("custom_text1", text1);
-//                        item.setMetaString("custom_text2", text2);
-//
-//                        return CommsMapComponent.ImportResult.SUCCESS;
-//                    }
-//
-//                    @Override
-//                    public boolean toCotDetail(MapItem item, CotEvent event, CotDetail root) {
-//                        return true;
-//                    }
-//                }); // **인자 하나만 전달**
-
-        //HelloWorld MapOverlay added to Overlay Manager.
         this.mapOverlay = new HelloWorldMapOverlay(view, pluginContext);
         view.getMapOverlayManager().addOverlay(this.mapOverlay);
 
