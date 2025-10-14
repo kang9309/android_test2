@@ -155,6 +155,8 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
     private CotDetailHandler customDataHandler; // 필드 추가
     private static final String PERSISTENT_MARKER_UID = "PLUGIN-CUSTOM-COMM-MARKER-FIXED-UID";
 
+    private static final String CHAT_COT_TYPE = "b-t-t"; // 채팅 메시지 타입
+
     @Override
     public void onStart(final Context context, final MapView view) {
         Log.d(TAG, "onStart");
@@ -164,6 +166,7 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
     public void onPause(final Context context, final MapView view) {
         Log.d(TAG, "onPause");
 //        sendCustomDataCot("test", "test2");
+//        sendCustomDataAsChat("Hello from Plugin", "DataA", "DataB");
     }
 
 
@@ -448,6 +451,102 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         }
     }
 
+    public void sendCustomDataAsChat(String message, String customData1, String customData2) {
+
+        // 1. Declare variables outside the try/catch block to extend their scope
+        CotDetail cotDetailRoot = null;
+        Marker tempMarker = null;
+        CotEvent cotEvent = null;
+        CotDetail customDataContainer = null;
+
+        final String TAG = "ChatCustomCotSender";
+
+        if (customData1 == null || customData2 == null) {
+            Log.w(TAG, "Custom data is null. Not sending CoT.");
+            return;
+        }
+
+        try {
+            // A 단말의 UID를 사용하거나 임시 UID를 사용합니다.
+            String eventUid = UUID.randomUUID().toString();
+
+            MapView mapView = MapView.getMapView();
+            if (mapView == null) {
+                Log.e(TAG, "MapView is null, cannot send CoT event.");
+                return;
+            }
+
+            // Chat CoT는 위치 정보가 중요하지 않지만, 기본 마커 정보는 필요합니다.
+            GeoPoint geoPoint = mapView.getSelfMarker().getPoint();
+
+            tempMarker = new Marker(geoPoint, eventUid);
+            tempMarker.setType(CHAT_COT_TYPE); // b-t-t (Chat)
+            tempMarker.setMetaString("how", "m-g"); // Multicast / Group
+            tempMarker.setMetaString("callsign", mapView.getSelfMarker().getMetaString("callsign", "ChatSender"));
+
+            cotEvent = CotEventFactory.createCotEvent(tempMarker);
+            cotEvent.setType(CHAT_COT_TYPE); // b-t-t (Chat)
+            cotEvent.setHow("m-g");
+
+            // *******************************************************************
+            // ** 5. Chat Detail 구성 **
+            // *******************************************************************
+            CotDetail chatDetail = new CotDetail("chat");
+            chatDetail.setAttribute("id", UUID.randomUUID().toString());
+            chatDetail.setAttribute("chatroom", "PluginComm"); // 채팅방 이름
+
+            // Message: 채팅창에 표시될 일반 메시지
+            CotDetail messageDetail = new CotDetail("message");
+            messageDetail.setAttribute("text", message + " [PLUGIN DATA]");
+            chatDetail.addChild(messageDetail);
+
+            // *******************************************************************
+            // ** 6. Custom Data Detail 구성: 커스텀 데이터를 XML 구조로 만듦 **
+            // *******************************************************************
+
+            CotDetail text1Detail = new CotDetail("text1");
+            text1Detail.setAttribute("value", customData1);
+            CotDetail text2Detail = new CotDetail("text2");
+            text2Detail.setAttribute("value", customData2);
+
+            // customDataContainer: <__custom_data>
+            customDataContainer = new CotDetail("__custom_data");
+            customDataContainer.addChild(text1Detail);
+            customDataContainer.addChild(text2Detail);
+
+            // cotDetailRoot: <detail> (CoT 이벤트의 최종 Detail 루트)
+            cotDetailRoot = new CotDetail("detail");
+            cotDetailRoot.addChild(chatDetail); // Chat Detail 추가
+            cotDetailRoot.addChild(customDataContainer); // Custom Detail 추가
+
+            // ********************************************************
+            // ** 7. CotEvent에 최종 Detail 객체 설정 **
+            // ********************************************************
+            cotEvent.setDetail(cotDetailRoot);
+
+            // ************************************************
+            // ** 8. CoT 전송: SEND_COT 인텐트 사용 **
+            // ************************************************
+            String cotXml = cotEvent.toString();
+
+            if (cotXml != null) {
+                Intent cotIntent = new Intent("com.atakmap.android.maps.SEND_COT");
+                cotIntent.putExtra("data", cotXml);
+                AtakBroadcast.getInstance().sendBroadcast(cotIntent);
+
+                Log.d(TAG, "Chat Custom CoT event sent: Type=" + CHAT_COT_TYPE + ", Text1='" + customData1 + "'");
+
+                // =========================================================================
+                // *** [로그 2 - 송신측 확인] 전송하는 CoT XML 전체 출력 ***
+                // A 단말에서 이 로그를 통해 <__custom_data> 태그가 있는지 확인합니다.
+                // =========================================================================
+                Log.d(TAG, "CoT XML Content (Debug): " + cotXml);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to send custom CoT message via Chat", e);
+        }
+    }
+
     // ** [수정] 하위 그룹을 이름으로 찾는 유틸리티 메서드 (static으로 변경하여 컴파일 오류 해결) **
     private static MapGroup findMapGroupByName(MapGroup parent, String name) {
         if (parent == null || name == null) {
@@ -519,7 +618,8 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         // GLMapItemFactory.registerSpi(GLSpecialMarker.SPI); // 이 부분도 제거하거나 주석 처리
 
         // ************************************************
-        // ** 핵심: __custom_data 태그를 처리하는 핸들러만 등록 **
+        // ** 1. Detail-based Handler (커스텀 데이터 처리) **
+        // ** (이 핸들러는 어떤 CoT Type 내부에서도 __custom_data를 찾습니다.) **
         // ************************************************
         customDataHandler = new CotDetailHandler("__custom_data") {
             private final String TAG = "CustomDataHandler";
@@ -528,7 +628,16 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
             public CommsMapComponent.ImportResult toItemMetadata(
                     MapItem item, CotEvent event, CotDetail detail) {
 
-                Log.d(TAG, "CommsMapComponent.ImportResult toItemMetadata invoked.");
+                // =========================================================================
+                // *** [핵심 진단 로그] 핸들러 진입 시점 로그 (이 로그가 찍히면 통신 성공) ***
+                // =========================================================================
+                Log.e(TAG, "!!! HANDLER INVOKED. CoT Type: " + event.getType() + ", Detail: " + (detail != null ? detail.getElementName() : "null"));
+                // =========================================================================
+
+                if (detail == null) {
+                    Log.w(TAG, "Detail is null, skipping metadata injection.");
+                    return CommsMapComponent.ImportResult.SUCCESS;
+                }
 
                 CotDetail text1Detail = detail.getFirstChildByName(0, "text1");
                 CotDetail text2Detail = detail.getFirstChildByName(0, "text2");
@@ -536,13 +645,12 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
                 String text1 = text1Detail != null ? text1Detail.getAttribute("value") : "N/A";
                 String text2 = text2Detail != null ? text2Detail.getAttribute("value") : "N/A";
 
-                // ***************************************************************
                 // 4. [핵심 로그]: 추출된 데이터 확인
-                Log.d(TAG, "SUCCESS PARSING: Text1=" + text1 + ", Text2=" + text2);
-                // ***************************************************************
+                Log.e(TAG, "SUCCESS PARSING: Text1=" + text1 + ", Text2=" + text2);
 
-                item.setMetaString("custom_text1", text1);
-                item.setMetaString("custom_text2", text2);
+                // 마커에 데이터를 저장하는 대신, 채팅 메시지 수신 시 플러그인 로직을 실행합니다.
+                // item.setMetaString("custom_text1", text1);
+                // item.setMetaString("custom_text2", text2);
 
                 return CommsMapComponent.ImportResult.SUCCESS;
             }
@@ -552,35 +660,13 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
                 return true;
             }
         };
-        // ************************************************
-        // ** 2. Type-based Handler (라우팅 강제용 더미 핸들러) **
-        // ** -> ATAK이 해당 Type의 CoT를 처리하도록 유도합니다. **
-        // ************************************************
-        typeHandler = new CotDetailHandler(CUSTOM_COT_TYPE) {
-            private final String TAG = "TypeRouterHandler";
 
-            @Override
-            public CommsMapComponent.ImportResult toItemMetadata(
-                    MapItem item, CotEvent event, CotDetail detail) {
-
-                // 이 핸들러는 단순 라우팅 역할만 하며, 실제 데이터 처리는 Detail 핸들러에게 맡깁니다.
-                Log.d(TAG, "Routing CoT update received for type: " + CUSTOM_COT_TYPE);
-                return CommsMapComponent.ImportResult.SUCCESS;
-            }
-
-            @Override
-            public boolean toCotDetail(MapItem item, CotEvent event, CotDetail root) {
-                return true;
-            }
-        };
 
         // ************************************************
-        // ** 3. [FIX] 핸들러 등록 순서 변경 (Type Handler를 먼저 등록) **
+        // ** 2. 핸들러 등록 **
         // ************************************************
-        // 1. Type Handler 등록: ATAK 코어에 이 Type에 관심이 있음을 먼저 알립니다.
-        CotDetailManager.getInstance().registerHandler(typeHandler);
-        // 2. Detail Handler 등록: 실제 파싱 로직을 담당하는 핸들러를 등록합니다.
         CotDetailManager.getInstance().registerHandler(customDataHandler);
+        Log.d(TAG, "CustomDataHandler successfully registered for __custom_data.");
 
         MapView currentView = MapView.getMapView();
         if (currentView != null) {
