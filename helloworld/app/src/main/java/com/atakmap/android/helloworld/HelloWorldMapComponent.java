@@ -149,7 +149,9 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
     private AtakAuthenticationCredentials authenticationCredentials;
     private CotDetailHandler typeHandler; // 새로 추가할 핸들러
     private static final String CUSTOM_COT_TYPE = "a-f-G-U-C"; // 전송에 사용하는 CoT Type
-
+    // ** 상수 정리: 마커 기반 통신 타입으로 변경 **
+    // ATAK 코어가 지도에 마커를 그리지만, 일반적인 사용자 데이터 타입은 아닙니다. (u-d-g-r: Undefined Group Role)
+    private static final String MARKER_COT_TYPE = "a-f-G-E";
 
     // HelloWorldMapComponent 클래스 내부
     private CotDetailHandler customDataHandler; // 필드 추가
@@ -167,6 +169,7 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         Log.d(TAG, "onPause");
 //        sendCustomDataCot("test", "test2");
 //        sendCustomDataAsChat("Hello from Plugin", "DataA", "DataB");
+        sendCustomDataAsMarker("FriendlyTest", "FinalTry", "a-f-G-E");
     }
 
 
@@ -235,82 +238,6 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         Log.d(TAG, "Broadcast Sent to hellojni: " + message);
 //        System.out.println("Broadcast Sent to hellojni: " + message);
     }
-
-//    public void sendTestMessageToHelloJNI(String message) {
-//        // 1. 대상 플러그인의 UID 정의
-//        // 'hellojni' 플러그인이 메시지 리스너를 등록할 때 사용한 고유 ID를 사용해야 합니다.
-//        // 일반적으로 플러그인 이름(예: "HelloWorldPlugin", "hellojni")을 UID로 사용합니다.
-//        final String TARGET_PLUGIN_UID = "hellojni";
-//
-//        // 2. PluginMessage 객체 생성
-//        // 대상 UID와 전송할 String 데이터를 페이로드로 지정합니다.
-//        PluginMessage pluginMessage = new PluginMessage(TARGET_PLUGIN_UID, message);
-//
-//        // 3. PluginManager를 통해 메시지 송신
-//        // 이 메시지를 수신하려면 'hellojni' 플러그인이 TARGET_PLUGIN_UID로 리스너를 등록해야 합니다.
-//        PluginManager.getInstance().sendMessage(pluginMessage);
-//
-//        System.out.println("Message Sent to [" + TARGET_PLUGIN_UID + "]: " + message);
-//    }
-
-//    public void sendCotMessage(double lat, double lon) {
-//        try {
-//            // ✅ 고유 식별자 (UID)
-//            String uid = "plugin-helloworld-" + java.util.UUID.randomUUID();
-//
-//            // ✅ 시간 정보 설정
-//            com.atakmap.coremap.maps.time.CoordinatedTime now =
-//                    new com.atakmap.coremap.maps.time.CoordinatedTime();
-//            com.atakmap.coremap.maps.time.CoordinatedTime stale =
-//                    new com.atakmap.coremap.maps.time.CoordinatedTime(now.getMilliseconds() + 60_000);
-//
-//            // ✅ 지도 중심 좌표 가져오기 (또는 직접 lat/lon 사용)
-//            com.atakmap.android.maps.MapView mapView = com.atakmap.android.maps.MapView.getMapView();
-////            com.atakmap.coremap.maps.coords.GeoPoint gp = mapView.getCenterPoint().get();
-////
-////            // ※ 중심 좌표 대신 인자로 받은 lat/lon을 사용할 수도 있음
-////            com.atakmap.coremap.maps.coords.GeoPoint point =
-////                    new com.atakmap.coremap.maps.coords.GeoPoint(lat, lon, 0.0);
-//
-//            // 지도 중심 좌표 가져오기
-//            GeoPoint gp = mapView.getCenterPoint().get();
-//
-//            // CotPoint 객체 생성 (CotEvent 생성자용)
-//            CotPoint point = new CotPoint(gp);
-//
-//            // ✅ CoT 이벤트 생성
-//            // 기존 (에러 발생)
-////            com.atakmap.coremap.maps.CotEvent event = ...
-//
-//            // 변경
-//            com.atakmap.coremap.cot.event.CotEvent event =
-//                    new com.atakmap.coremap.cot.event.CotEvent(
-//                            uid,               // UID
-//                            "b-t-f",           // Type (Blue Force Friendly)
-//                            "m-g",             // How (machine-generated)
-//                            point,             // GeoPoint
-//                            now,               // start
-//                            stale,             // stale
-//                            now,               // how time
-//                            "HelloWorld",      // detail name
-//                            null,              // detail (null 가능)
-//                            "Hello World!",    // remarks
-//                            "plugin",          // creator group
-//                            "helloworld"       // creator name
-//                    );
-//
-//            // ✅ CoT 송신
-////            com.atakmap.android.cot.CotMapComponent.getInstance().sendCot(event);
-//            // sendCotMessage 사용
-////            com.atakmap.android.cot.CotMapComponent.getInstance().sendCotMessage(event);
-//            CotEventBus.getInstance(mapView).post(event);
-//
-//            android.util.Log.i("ATAK_HelloWorld", "📤 Sent CoT message: " + uid
-//                    + " (" + lat + ", " + lon + ")");
-//        } catch (Exception e) {
-//            android.util.Log.e("ATAK_HelloWorld", "sendCotMessage failed", e);
-//        }
-//    }
 
 
     /**
@@ -598,6 +525,114 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         Log.d(TAG, "Attached Point Changed listener to marker: " + marker.getUID());
     }
 
+    /**
+     * [Marker-Based Send] 커스텀 데이터를 임시 마커 CoT 이벤트(u-d-g-r)에 담아 전송합니다.
+     * 마커를 지도에 강제로 추가하여 라우팅 안정성을 테스트합니다.
+     */
+    public void sendCustomDataAsMarker(String markerTitle, String customData1, String customData2) {
+
+        // CotDetail cotDetailRoot = null; // 필요 없음
+        Marker tempMarker = null;
+        CotEvent cotEvent = null;
+        CotDetail customDataContainer = null;
+
+        final String TAG = "MarkerCustomCotSender";
+
+        if (customData1 == null || customData2 == null) {
+            Log.w(TAG, "Custom data is null. Not sending CoT.");
+            return;
+        }
+
+        try {
+            String eventUid = UUID.randomUUID().toString();
+
+            MapView mapView = MapView.getMapView();
+            if (mapView == null) {
+                Log.e(TAG, "MapView is null, cannot send CoT event.");
+                return;
+            }
+
+            // 1. A기기에서 마커를 만들고 지도에 추가 (1단계)
+            // 현재 자기 위치를 중심으로 임시 마커 생성
+            GeoPoint geoPoint = mapView.getSelfMarker().getPoint();
+            tempMarker = new Marker(geoPoint, eventUid);
+            tempMarker.setType(MARKER_COT_TYPE); // u-d-g-r (임시 마커 타입)
+            tempMarker.setMetaString("how", "m-g"); // Multicast / Group
+            tempMarker.setMetaString("callsign", markerTitle); // 마커 이름
+            tempMarker.setTitle(markerTitle);
+
+            // 마커를 지도에 강제로 추가하여 ATAK 코어가 이 마커를 SA(Situation Awareness)로 처리하게 유도
+            // [수정: 문법 오류 수정]
+            mapView.getRootGroup().addItem(tempMarker);
+            Log.d(TAG, "Temporary Marker created and added to map: " + eventUid);
+
+            cotEvent = CotEventFactory.createCotEvent(tempMarker);
+            cotEvent.setType(MARKER_COT_TYPE);
+            cotEvent.setHow("m-g");
+
+            // *******************************************************************
+            // ** 2. Custom Data Detail 구성: 커스텀 데이터를 XML 구조로 만듦 **
+            // *******************************************************************
+
+            CotDetail text1Detail = new CotDetail("text1");
+            text1Detail.setAttribute("value", customData1);
+            CotDetail text2Detail = new CotDetail("text2");
+            text2Detail.setAttribute("value", customData2);
+
+            // customDataContainer: <__custom_data>
+            customDataContainer = new CotDetail("__custom_data");
+            customDataContainer.addChild(text1Detail);
+            customDataContainer.addChild(text2Detail);
+
+            // ********************************************************
+            // ** 3. CotEvent에 최종 Detail 객체 설정 (기존 Detail에 추가) **
+            // ********************************************************
+            // 기존 Detail을 가져오거나, 없으면 새로 생성
+            CotDetail detailRoot = cotEvent.getDetail();
+            if (detailRoot == null) {
+                detailRoot = new CotDetail("detail");
+                cotEvent.setDetail(detailRoot);
+            }
+
+            // 커스텀 컨테이너를 Detail 루트에 추가 (이전처럼 덮어쓰지 않고 추가)
+            detailRoot.addChild(customDataContainer);
+
+
+            // ************************************************
+            // ** 4. CoT 전송: SEND_COT 인텐트 사용 (2단계) **
+            // ************************************************
+            String cotXml = cotEvent.toString();
+
+            if (cotXml != null) {
+                Intent cotIntent = new Intent("com.atakmap.android.maps.SEND_COT");
+                cotIntent.putExtra("data", cotXml);
+                AtakBroadcast.getInstance().sendBroadcast(cotIntent);
+
+                Log.d(TAG, "Marker Custom CoT event sent: Type=" + MARKER_COT_TYPE + ", Title='" + markerTitle + "'");
+
+                // =========================================================================
+                // *** [로그 2 - 송신측 확인] 전송하는 CoT XML 전체 출력 (루프백 테스트) ***
+                // =========================================================================
+                Log.d(TAG, "CoT XML Content (Debug): " + cotXml);
+
+                // =========================================================================
+                // *** [새로운 루프백 로직] 로컬 핸들러를 강제로 실행하여 파싱 테스트 ***
+                // =========================================================================
+                // ATAK의 sendBroadcast가 자신의 핸들러를 트리거하지 못할 수 있으므로,
+                // 파싱 로직의 유효성 검증을 위해 수신 핸들러를 직접 호출합니다.
+                try {
+                    customDataHandler.toItemMetadata(tempMarker, cotEvent, customDataContainer);
+                    Log.d(TAG, "!!! Manual Loopback Test Invoked. Check for SUCCESS PARSING log above.");
+                } catch (Exception loopbackE) {
+                    Log.e(TAG, "Manual Loopback failed.", loopbackE);
+                }
+                // =========================================================================
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to send custom CoT message via Marker", e);
+        }
+    }
+
     @Override
     public void onCreate(final Context context, Intent intent,
             final MapView view) {
@@ -608,8 +643,6 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         context.setTheme(R.style.ATAKPluginTheme);
 
         super.onCreate(context, intent, view);
-        // ✅ [수정] onCreate()에서 Context를 전달받아 저장합니다.
-//        this.context = context;
 
         pluginContext = context;
 
