@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "LINKED_RESOURCES_BINARY_FORMAT",
+    "kind": "Directory"
+  },
+  "applicationId": "com.atakmap.android.plugintemplate.plugin",
+  "variantName": "civDebug",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 1760592832,
+      "versionName": "0.1 (f384a2a3) - [5.5.0]",
+      "outputFile": "linked-resources-binary-format-civDebug.ap_"
+    }
+  ],
+  "elementType": "File"
+}

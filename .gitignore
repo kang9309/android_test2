@@ -3,7 +3,7 @@
 /customtiles
 # /hellojni
 hellojni/app/build/
-/plugintemplate
+# /plugintemplate
 /sensortester
 /windconsumer
 /PluginTemplateLegacy
