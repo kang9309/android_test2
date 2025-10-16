@@ -3,13 +3,17 @@
 /customtiles
 # /hellojni
 hellojni/app/build/
+hellojni/local.properties
 # /plugintemplate
+plugintemplate/app/build/
+plugintemplate/local.properties
 /sensortester
 /windconsumer
 /PluginTemplateLegacy
 /dsmmanager
 # /helloworld
 helloworld/app/build/
+helloworld/local.properties
 /plugintemplate-compose  smsservice
 /windprovider
 /action-bar-demo
