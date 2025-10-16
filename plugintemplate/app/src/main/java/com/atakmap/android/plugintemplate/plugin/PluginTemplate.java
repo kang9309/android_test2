@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.atak.plugins.impl.PluginContextProvider;
 import com.atak.plugins.impl.PluginLayoutInflater;
+import com.atakmap.coremap.log.Log;
 
 import gov.tak.api.plugin.IPlugin;
 import gov.tak.api.plugin.IServiceController;
@@ -16,12 +17,20 @@ import gov.tak.api.ui.ToolbarItemAdapter;
 import gov.tak.platform.marshal.MarshalManager;
 
 public class PluginTemplate implements IPlugin {
-
+    public static final String CLASS_TAG = "PluginTemplate";
     IServiceController serviceController;
     Context pluginContext;
     IHostUIService uiService;
     ToolbarItem toolbarItem;
     Pane templatePane;
+    private MulticastReceiver receiver;
+    private Thread receiverThread;
+
+    private MulticastReceiver multicastReceiver = null;
+    private Thread multicastReceiverThread = null;
+    private static final String MULTICAST_ADDRESS = "224.0.0.1";
+    private static final int MULTICAST_PORT = 6969;
+
 
     public PluginTemplate(IServiceController serviceController) {
         this.serviceController = serviceController;
@@ -55,11 +64,23 @@ public class PluginTemplate implements IPlugin {
 
     @Override
     public void onStart() {
+        Log.d(CLASS_TAG, LogUtils.getLogPosition() + " ");
+
         // the plugin is starting, add the button to the toolbar
         if (uiService == null)
             return;
 
         uiService.addToolbarItem(toolbarItem);
+
+        // [네트워크 테스트] MulticastReceiver 시작
+        try {
+            multicastReceiver = new MulticastReceiver(MULTICAST_ADDRESS, MULTICAST_PORT);
+            multicastReceiverThread = new Thread(multicastReceiver, "MulticastReceiverThread");
+            multicastReceiverThread.start();
+            Log.d(CLASS_TAG, "Multicast Receiver Thread started: " + MULTICAST_ADDRESS + ":" + MULTICAST_PORT);
+        } catch (Exception e) {
+            Log.e(CLASS_TAG, "Failed to start Multicast Receiver Thread", e);
+        }
     }
 
     @Override
