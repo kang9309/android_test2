@@ -91,6 +91,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.io.StringReader; // <-- 추가된 import
+import java.io.IOException; // <-- 추가된 import
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -101,6 +104,14 @@ import java.util.concurrent.Executors;
 import java.util.UUID;
 import java.util.Collection;
 
+// 멀티캐스트 소켓을 위한 Java 네트워크 라이브러리 추가
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.nio.charset.StandardCharsets;
+import java.io.IOException;
+
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -108,7 +119,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.OutputKeys;
-
+//import com.example.plugin.PluginDataTransfer; // 작성된 클래스 import
 
 
 /**
@@ -152,6 +163,7 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
     // ** 상수 정리: 마커 기반 통신 타입으로 변경 **
     // ATAK 코어가 지도에 마커를 그리지만, 일반적인 사용자 데이터 타입은 아닙니다. (u-d-g-r: Undefined Group Role)
     private static final String MARKER_COT_TYPE = "a-f-G-E";
+    private static final String CUSTOM_MARKER_GROUP_NAME = "Markers test";
 
     // HelloWorldMapComponent 클래스 내부
     private CotDetailHandler customDataHandler; // 필드 추가
@@ -159,9 +171,148 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
 
     private static final String CHAT_COT_TYPE = "b-t-t"; // 채팅 메시지 타입
 
+    // 멀티캐스트 테스트를 위한 변수
+    private static final String MULTICAST_ADDRESS = "224.0.0.1";
+    private static final int MULTICAST_PORT = 6969; // ATAK에서 자주 사용하는 포트
+    private MulticastReceiver receiver;
+    private Thread receiverThread;
+    // PluginDataTransfer 클래스의 인스턴스
+//    private PluginDataTransfer dataTransfer;
+
+
+    // ===============================================
+    // 멀티캐스트 송수신 로직
+    // ===============================================
+
+    /**
+     * 멀티캐스트 수신을 전담하는 Runnable 클래스
+     * 스레드 안전성을 높이기 위해 'static'으로 변경되었습니다.
+     */
+    private static class MulticastReceiver implements Runnable {
+        private volatile boolean running = true;
+        private MulticastSocket socket = null;
+        private InetAddress group = null;
+
+        public void terminate() {
+            running = false;
+            if (socket != null && !socket.isClosed()) {
+                try {
+                    // 소켓을 닫아 대기 중인 receive() 호출을 해제합니다.
+                    socket.leaveGroup(group);
+                    socket.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Error closing multicast socket", e);
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            try {
+                // MulticastSocket 생성 및 그룹 참여
+                socket = new MulticastSocket(MULTICAST_PORT);
+                group = InetAddress.getByName(MULTICAST_ADDRESS);
+                socket.joinGroup(group);
+                Log.d(TAG, "Multicast Receiver 시작: " + MULTICAST_ADDRESS + ":" + MULTICAST_PORT);
+
+                byte[] buf = new byte[4096];
+                while (running) {
+                    DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                    // 패킷 수신 대기 (블로킹)
+                    socket.receive(packet);
+
+                    if (!running) break;
+
+                    String received = new String(packet.getData(), 0, packet.getLength(), StandardCharsets.UTF_8);
+
+                    // 수신된 CoT XML 데이터를 로그로 출력
+                    // 실제 ATAK은 이 포트를 통해 수신된 CoT를 지도에 자동으로 표시합니다.
+                    Log.d(TAG, "CoT Multicast Received: " + received.substring(0, Math.min(received.length(), 100)) + "...");
+                }
+            } catch (IOException e) {
+                if (running) {
+                    Log.e(TAG, "Multicast Receiver 오류 발생", e);
+                }
+            } finally {
+                if (socket != null && !socket.isClosed()) {
+                    socket.close();
+                }
+                Log.d(TAG, "Multicast Receiver 종료됨");
+            }
+        }
+    }
+
+    /**
+     * 현재 지도 중심의 위치를 CoT XML 형태로 멀티캐스트로 전송하는 메소드입니다.
+     */
+    public void sendCoTMulticast() {
+        Log.e(TAG, "sendCoTMulticast.");
+        try {
+            Log.e(TAG, "try.");
+            // 현재 지도 중심 좌표를 얻습니다.
+            MapView mapView = MapView.getMapView();
+            Log.e(TAG, "254.");
+            if (mapView == null) {
+                Log.e(TAG, "MapView is null, cannot send CoT event.");
+                return;
+            }
+            Log.e(TAG, "259.");
+
+            // Chat CoT는 위치 정보가 중요하지 않지만, 기본 마커 정보는 필요합니다.
+            GeoPoint center = mapView.getSelfMarker().getPoint();
+//            GeoPoint center = mapView.getMapController().getCenterPoint();
+            Log.e(TAG, "264.");
+            // 테스트를 위한 CoT XML 메시지 생성
+            String cotXml = String.format(
+                    "<event version='2.0' type='a-h-G-U-T' uid='ATAK_Test_Multicast_%d' time='%s' start='%s' stale='%s' how='h-g'>" +
+                            "<point lat='%.6f' lon='%.6f' hae='0.0' ce='9999999.0' le='9999999.0'/>" +
+                            "</event>",
+                    System.currentTimeMillis(),
+                    "2025-01-01T00:00:00.000Z", // 실제 UTC 시간으로 포맷해야 합니다.
+                    "2025-01-01T00:00:00.000Z",
+                    "2025-01-01T00:00:10.000Z",
+                    center.getLatitude(),
+                    center.getLongitude()
+            );
+            Log.e(TAG, "277.");
+            MulticastSocket socket = new MulticastSocket();
+            InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+            byte[] buffer = cotXml.getBytes(StandardCharsets.UTF_8);
+
+            Log.e(TAG, "282.");
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, MULTICAST_PORT);
+            socket.send(packet);
+            Log.e(TAG, "285.");
+            socket.close();
+
+            Log.d(TAG, "CoT 멀티캐스트 전송 성공: " + center.toString());
+
+        } catch (IOException e) {
+            Log.e(TAG, "CoT 멀티캐스트 전송 오류", e);
+        }
+    }
+
+    // ===============================================
+    // 플러그인 생명주기 관련 메소드 (송수신 스레드 관리)
+    // ===============================================
+
     @Override
     public void onStart(final Context context, final MapView view) {
         Log.d(TAG, "onStart");
+        // 플러그인이 시작될 때 멀티캐스트 수신기를 시작합니다.
+        if (receiver == null) {
+            receiver = new MulticastReceiver();
+            receiverThread = new Thread(receiver);
+            receiverThread.start();
+        }
+
+        // [수정된 부분]: sendCoTMulticast()를 메인 스레드가 아닌 새로운 스레드에서 실행
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sendCoTMulticast();
+            }
+        }).start();
     }
 
     @Override
@@ -169,9 +320,69 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         Log.d(TAG, "onPause");
 //        sendCustomDataCot("test", "test2");
 //        sendCustomDataAsChat("Hello from Plugin", "DataA", "DataB");
-        sendCustomDataAsMarker("FriendlyTest", "FinalTry", "a-f-G-E");
+//        sendCustomDataAsMarker("FriendlyTest", "FinalTry", "a-f-G-E");
+//            sendCustomNAMarker();
     }
 
+    // ************************************************
+    // ** 새로운 CoT 수신 BroadcastReceiver 정의 **
+    // ************************************************
+    private final BroadcastReceiver cotReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // 이 인텐트는 수신된 모든 CoT XML을 "xml" Extra에 담아 브로드캐스트합니다.
+            Log.d(TAG, "onReceive");
+            if ("com.atakmap.android.maps.RECEIVED_COT".equals(intent.getAction())) {
+                String cotXml = intent.getStringExtra("xml");
+//                if (cotXml != null) {
+//
+//                    // --- 파싱 오류 회피: 표준 XML 파서 (DOM) 사용 ---
+//                    // 이 로직은 ATAK SDK의 CotEventFactory.parse() 오류를 우회하고,
+//                    // 수신된 XML 문자열이 유효한지 확인하는 데 사용됩니다.
+//                    try {
+//                        // 1. XML 파서 설정
+//                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+//                        DocumentBuilder builder = factory.newDocumentBuilder();
+//
+//                        // 2. 문자열을 파싱할 수 있는 InputSource로 변환
+//                        InputSource is = new InputSource(new StringReader(cotXml));
+//
+//                        // 3. 파싱 실행
+//                        Document doc = builder.parse(is);
+//                        doc.getDocumentElement().normalize();
+//
+//                        // 4. Verification: 우리가 원하는 커스텀 데이터 태그를 포함하고 있는지 확인
+//                        NodeList customDataNodes = doc.getElementsByTagName("__custom_data");
+//
+//                        // 5. 결과 로그 출력: 브로드캐스트 수신 성공 여부를 확인하는 핵심 로그
+//                        if (customDataNodes.getLength() > 0) {
+//                            Log.e(TAG, "!!! SUCCESS: Custom CoT XML received and validated using standard XML parser. Broadcast is working correctly.");
+//                            Log.d(TAG, "Received CoT Content: " + cotXml.substring(0, Math.min(cotXml.length(), 256)) + "...");
+//
+//                            // (주의: 이 부분은 CotDetailHandler의 toItemMetadata()가 처리합니다.
+//                            // 여기서 추가적인 로직이 필요하다면 작성하시면 됩니다.)
+//
+//                        } else {
+//                            // 일반 CoT 이벤트는 무시
+//                            Log.d(TAG, "Received non-custom CoT XML via broadcast.");
+//                        }
+//
+//                    } catch (ParserConfigurationException e) {
+//                        Log.e(TAG, "XML Parser configuration error", e);
+//                    } catch (SAXException e) {
+//                        // XML 구조가 잘못되었을 때 발생하는 오류
+//                        Log.e(TAG, "Received XML is structurally invalid (SAX Error)", e);
+//                    } catch (IOException e) {
+//                        Log.e(TAG, "Error reading XML string", e);
+//                    } catch (Exception e) {
+//                        // 기타 예상치 못한 오류
+//                        Log.e(TAG, "An unexpected error occurred during XML parsing", e);
+//                    }
+//                    // --- 표준 XML 파싱 로직 끝 ---
+//                }
+            }
+        }
+    };
 
     /**
      * org.w3c.dom.Element 객체를 XML 문자열로 변환합니다.
@@ -220,6 +431,18 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
     public void onStop(final Context context,
             final MapView view) {
         Log.d(TAG, "onStop");
+        // 플러그인이 중지될 때 멀티캐스트 수신기를 안전하게 종료합니다.
+        if (receiver != null) {
+            receiver.terminate();
+            try {
+                receiverThread.join(5000); // 스레드 종료 대기
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                Log.e(TAG, "Receiver thread interruption", e);
+            }
+            receiver = null;
+            receiverThread = null;
+        }
     }
 
     public void sendTestMessageToHelloJNI(String message) {
@@ -364,18 +587,18 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
             Log.e(TAG, "Failed to send custom CoT message", e);
         }
 
-        // --- 9. [강제 로컬 디스패치] 로컬 테스트용 로직 (통신 문제 진단 회피용) ---
-        if (customDataHandler != null && tempMarker != null && cotEvent != null && customDataContainer != null) {
-
-            customDataHandler.toItemMetadata(
-                    tempMarker,           // 생성된 임시 마커 (item)
-                    cotEvent,             // 생성된 CoT 이벤트 (event)
-                    customDataContainer   // <__custom_data> Detail 객체
-            );
-            Log.d(TAG, "Debug: Forced local dispatch complete. Check CustomDataHandler logs.");
-        } else {
-            Log.e(TAG, "Debug: Cannot perform forced dispatch. Handler/Marker/Event is null.");
-        }
+//        // --- 9. [강제 로컬 디스패치] 로컬 테스트용 로직 (통신 문제 진단 회피용) ---
+//        if (customDataHandler != null && tempMarker != null && cotEvent != null && customDataContainer != null) {
+//
+//            customDataHandler.toItemMetadata(
+//                    tempMarker,           // 생성된 임시 마커 (item)
+//                    cotEvent,             // 생성된 CoT 이벤트 (event)
+//                    customDataContainer   // <__custom_data> Detail 객체
+//            );
+//            Log.d(TAG, "Debug: Forced local dispatch complete. Check CustomDataHandler logs.");
+//        } else {
+//            Log.e(TAG, "Debug: Cannot perform forced dispatch. Handler/Marker/Event is null.");
+//        }
     }
 
     public void sendCustomDataAsChat(String message, String customData1, String customData2) {
@@ -480,7 +703,9 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
             return null;
         }
         for (MapGroup group : parent.getChildGroups()) {
-            if (name.equals(group.getFriendlyName())) {
+            String gN = group.getFriendlyName();
+            Log.e(TAG, "gN[" + gN);
+            if (name.equals(gN)) {
                 return group;
             }
         }
@@ -498,7 +723,9 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         // ** [수정]: Collection<MapItem> 타입 사용 **
         Collection<MapItem> items = group.getItems();
         for (MapItem item : items) {
-            if (uid.equals(item.getUID())) {
+            String itemUid = item.getUID();
+            Log.e(TAG, "itemUid[" + itemUid);
+            if (uid.equals(itemUid)) {
                 return item;
             }
         }
@@ -544,7 +771,7 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         }
 
         try {
-            String eventUid = UUID.randomUUID().toString();
+            String eventUid = PERSISTENT_MARKER_UID;//UUID.randomUUID().toString();
 
             MapView mapView = MapView.getMapView();
             if (mapView == null) {
@@ -552,18 +779,44 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
                 return;
             }
 
+            // =========================================================================
+            // *** [수정된 로직] 마커를 지정된 커스텀 그룹에 추가 ***
+            // =========================================================================
+            MapGroup rootGroup = mapView.getRootGroup();
+            // 그룹 이름으로 찾기. 없으면 생성 (생성된 그룹은 루트 그룹의 하위로 들어갑니다)
+            MapGroup targetGroup = findMapGroupByName(rootGroup, CUSTOM_MARKER_GROUP_NAME);
+
+            if (targetGroup == null) {
+                targetGroup = rootGroup.addGroup(CUSTOM_MARKER_GROUP_NAME);
+                Log.d(TAG, "Created new MapGroup: " + CUSTOM_MARKER_GROUP_NAME);
+            }
+
+            MapItem existingItem = findItemByUID(rootGroup, PERSISTENT_MARKER_UID);
+
+            // 기존 마커가 있다면 업데이트하고, 없다면 새로 추가합니다.
+            // ** [수정]: findItemByUID를 사용하여 MapGroup API 오버로드 충돌 회피 **
+            if (existingItem == null) {
+                Log.d(TAG, "1Persistent Comm Marker added with UID: " + PERSISTENT_MARKER_UID);
+
+            } else {
+                Log.d(TAG, "1Persistent Comm Marker already exists.");
+                logMapItemDetails(existingItem);
+                return;
+            }
+
             // 1. A기기에서 마커를 만들고 지도에 추가 (1단계)
             // 현재 자기 위치를 중심으로 임시 마커 생성
             GeoPoint geoPoint = mapView.getSelfMarker().getPoint();
             tempMarker = new Marker(geoPoint, eventUid);
-            tempMarker.setType(MARKER_COT_TYPE); // u-d-g-r (임시 마커 타입)
+            tempMarker.setType(MARKER_COT_TYPE);
             tempMarker.setMetaString("how", "m-g"); // Multicast / Group
             tempMarker.setMetaString("callsign", markerTitle); // 마커 이름
             tempMarker.setTitle(markerTitle);
 
             // 마커를 지도에 강제로 추가하여 ATAK 코어가 이 마커를 SA(Situation Awareness)로 처리하게 유도
             // [수정: 문법 오류 수정]
-            mapView.getRootGroup().addItem(tempMarker);
+
+            rootGroup.addItem(tempMarker);
             Log.d(TAG, "Temporary Marker created and added to map: " + eventUid);
 
             cotEvent = CotEventFactory.createCotEvent(tempMarker);
@@ -620,16 +873,94 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
                 // =========================================================================
                 // ATAK의 sendBroadcast가 자신의 핸들러를 트리거하지 못할 수 있으므로,
                 // 파싱 로직의 유효성 검증을 위해 수신 핸들러를 직접 호출합니다.
-                try {
-                    customDataHandler.toItemMetadata(tempMarker, cotEvent, customDataContainer);
-                    Log.d(TAG, "!!! Manual Loopback Test Invoked. Check for SUCCESS PARSING log above.");
-                } catch (Exception loopbackE) {
-                    Log.e(TAG, "Manual Loopback failed.", loopbackE);
-                }
+//                try {
+//                    customDataHandler.toItemMetadata(tempMarker, cotEvent, customDataContainer);
+//                    Log.d(TAG, "!!! Manual Loopback Test Invoked. Check for SUCCESS PARSING log above.");
+//                } catch (Exception loopbackE) {
+//                    Log.e(TAG, "Manual Loopback failed.", loopbackE);
+//                }
                 // =========================================================================
             }
         } catch (Exception e) {
             Log.e(TAG, "Failed to send custom CoT message via Marker", e);
+        }
+    }
+
+    /**
+     * [마커 정보 출력]
+     * 주어진 MapItem의 주요 속성을 로그로 상세히 출력합니다.
+     * @param item 정보를 출력할 MapItem 객체
+     */
+    private void logMapItemDetails(MapItem item) {
+        final String TAG = "MapItemDetails";
+
+        if (item == null) {
+            Log.w(TAG, "MapItem is null. Cannot display details.");
+            return;
+        }
+
+        Log.i(TAG, "================ MapItem Details ================");
+        Log.i(TAG, "UID: " + item.getUID());
+        Log.i(TAG, "Title: " + item.getTitle());
+        Log.i(TAG, "Type: " + item.getType());
+
+        // PointMapItem인 경우에만 위치 정보 출력
+        if (item instanceof PointMapItem) {
+            PointMapItem pointItem = (PointMapItem) item;
+            GeoPoint p = pointItem.getPoint();
+            Log.i(TAG, String.format("Location: %.6f, %.6f (Lat, Lon)", p.getLatitude(), p.getLongitude()));
+//            Log.i(TAG, "Altitude: " + (p.isAltitudeSupported() ? p.getAltitude() : "N/A"));
+        } else {
+            Log.i(TAG, "Location: Not a PointMapItem (e.g., Shape, Line)");
+        }
+
+        // 커스텀 메타데이터 예시 출력 (있는 경우)
+
+//        if (item.hasMetaData("CustomData1")) {
+        // 커스텀 메타데이터 예시 출력 (hasMetaData() 대신 getMetaString() 체크 사용)
+        String customData1 = item.getMetaString("CustomData1", null);
+        if (customData1 != null) {
+            Log.i(TAG, "CustomData1: " + customData1);
+        }
+
+        String callsign = item.getMetaString("callsign", null);
+        if (callsign != null) {
+            Log.i(TAG, "Callsign: " + callsign);
+        }
+        Log.i(TAG, "===============================================");
+    }
+
+    public void sendCustomNAMarker(){
+        MapView currentView = MapView.getMapView();
+        if (currentView != null) {
+
+            GeoPoint markerLoc = new GeoPoint(34.0, -118.0); // 캘리포니아 LA 근처
+            Marker commMarker = new Marker(markerLoc, PERSISTENT_MARKER_UID);
+            commMarker.setType(MARKER_COT_TYPE);
+            commMarker.setMetaString("callsign", "ksh_test"); // 콜사인 변경
+            commMarker.setMetaString("how", "m-g"); // SA 메시지로 전송
+            commMarker.setVisible(true); // 지도에서 보이게 설정
+
+            MapGroup rootGroup = currentView.getRootGroup();
+
+            // **[수정] static 메서드를 사용하여 그룹 찾기**
+            MapGroup commGroup = findMapGroupByName(rootGroup, CUSTOM_MARKER_GROUP_NAME);
+
+            if (commGroup == null) {
+                commGroup = rootGroup.addGroup(CUSTOM_MARKER_GROUP_NAME);
+            }
+
+            MapItem existingItem = findItemByUID(commGroup, PERSISTENT_MARKER_UID);
+
+            // 기존 마커가 있다면 업데이트하고, 없다면 새로 추가합니다.
+            // ** [수정]: findItemByUID를 사용하여 MapGroup API 오버로드 충돌 회피 **
+            if (existingItem == null) {
+                commGroup.addItem(commMarker);
+                Log.d(TAG, "Persistent Comm Marker added with UID: " + PERSISTENT_MARKER_UID);
+                existingItem = commMarker;
+            } else {
+                Log.d(TAG, "Persistent Comm Marker already exists.");
+            }
         }
     }
 
@@ -700,47 +1031,12 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         // ************************************************
         CotDetailManager.getInstance().registerHandler(customDataHandler);
         Log.d(TAG, "CustomDataHandler successfully registered for __custom_data.");
-
-        MapView currentView = MapView.getMapView();
-        if (currentView != null) {
-
-            GeoPoint markerLoc = new GeoPoint(34.0, -118.0); // 캘리포니아 LA 근처
-            Marker commMarker = new Marker(markerLoc, PERSISTENT_MARKER_UID);
-            commMarker.setType("a-f-G-U-C");
-            commMarker.setMetaString("callsign", "CommChannelUpdater"); // 콜사인 변경
-            commMarker.setMetaString("how", "m-g"); // SA 메시지로 전송
-            commMarker.setVisible(true); // 지도에서 보이게 설정
-
-            MapGroup rootGroup = currentView.getRootGroup();
-
-            // **[수정] static 메서드를 사용하여 그룹 찾기**
-            MapGroup commGroup = findMapGroupByName(rootGroup, "Plugin Comm Group");
-
-            if (commGroup == null) {
-                commGroup = rootGroup.addGroup("Plugin Comm Group");
-            }
-
-            MapItem existingItem = findItemByUID(commGroup, PERSISTENT_MARKER_UID);
-
-            // 기존 마커가 있다면 업데이트하고, 없다면 새로 추가합니다.
-            // ** [수정]: findItemByUID를 사용하여 MapGroup API 오버로드 충돌 회피 **
-            if (existingItem == null) {
-                commGroup.addItem(commMarker);
-                Log.d(TAG, "Persistent Comm Marker added with UID: " + PERSISTENT_MARKER_UID);
-                existingItem = commMarker;
-            } else {
-                Log.d(TAG, "Persistent Comm Marker already exists.");
-            }
-
-            // -------------------------------------------------------------------
-            // ** [NEW FIX] Map Item Listener 추가 (핵심 진단 로직) **
-            // -------------------------------------------------------------------
-            if (existingItem instanceof Marker) {
-                addMarkerListeners((Marker) existingItem);
-            }
-        }
-
-        Log.d(TAG, "CustomDataHandler successfully registered.");
+        // ************************************************
+        // ** 3. CoT BroadcastReceiver 등록 **
+        // ************************************************
+        AtakBroadcast.getInstance().registerReceiver(cotReceiver,
+                new DocumentedIntentFilter("com.atakmap.android.maps.RECEIVED_COT"));
+        Log.d(TAG, "BroadcastReceiver registered for RECEIVED_COT.");
 
 
         this.mapOverlay = new HelloWorldMapOverlay(view, pluginContext);
@@ -1184,6 +1480,7 @@ public class HelloWorldMapComponent extends DropDownMapComponent implements Shar
         if (helloImporter != null) {
             ImportExportMapComponent.getInstance().removeImporterClass(this.helloImporter);
         }
+
         super.onDestroyImpl(context, view);
 
         // Example call on how to end ATAK if the plugin is unloaded.
