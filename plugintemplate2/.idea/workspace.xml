@@ -4,12 +4,20 @@
     <shared>
       <config />
     </shared>
+    <layouts>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/main_layout.xml">
+        <config>
+          <theme>@style/AppTheme</theme>
+        </config>
+      </layout>
+    </layouts>
   </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a0b706c-aa9c-4197-a0c0-0dbde59056ba" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/atakmap/android/plugintemplate/plugin/LogUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../hellojni/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../hellojni/local.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../helloworld/.gradle/8.13/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.gradle/8.13/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../helloworld/.gradle/8.13/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.gradle/8.13/executionHistory/executionHistory.lock" afterDir="false" />
@@ -38,46 +46,9 @@
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/proguard-gradle.txt" beforeDir="false" afterPath="$PROJECT_DIR$/app/proguard-gradle.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/gov/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/gov/res/values/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/assets/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/assets/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atakmap/android/plugintemplate/plugin/PluginNativeLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atakmap/android/plugintemplate/plugin/PluginNativeLoader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atakmap/android/plugintemplate/plugin/PluginTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atakmap/android/plugintemplate/plugin/PluginTemplate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/btn_gray.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/btn_gray.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/new_dark_button_bg.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/new_dark_button_bg.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/new_dark_button_disabled.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/new_dark_button_disabled.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/new_dark_button_selected.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/new_dark_button_selected.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/main_layout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/main_layout.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/colors.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/dimen.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/dimen.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/styles.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/xml/com_android_vending_archive_opt_out.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/xml/com_android_vending_archive_opt_out.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/test/java/com/atakmap/android/test/ExampleTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/test/java/com/atakmap/android/test/ExampleTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/user_manual/formatting.typ" beforeDir="false" afterPath="$PROJECT_DIR$/docs/user_manual/formatting.typ" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/user_manual/junk/edit_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/docs/user_manual/junk/edit_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/user_manual/junk/excheck_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/docs/user_manual/junk/excheck_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/user_manual/junk/fullscreen_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/docs/user_manual/junk/fullscreen_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/user_manual/junk/halfscreen_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/docs/user_manual/junk/halfscreen_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/user_manual/junk/new_checklist_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/docs/user_manual/junk/new_checklist_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/user_manual/junk/new_template_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/docs/user_manual/junk/new_template_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/user_manual/junk/upload_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/docs/user_manual/junk/upload_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/user_manual/junk/upload_to_data_sync_icon.svg" beforeDir="false" afterPath="$PROJECT_DIR$/docs/user_manual/junk/upload_to_data_sync_icon.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/user_manual/titlepage.svg" beforeDir="false" afterPath="$PROJECT_DIR$/docs/user_manual/titlepage.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/user_manual/usermanual.typ" beforeDir="false" afterPath="$PROJECT_DIR$/docs/user_manual/usermanual.typ" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/typst.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/typst.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/template.local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/template.local.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -92,6 +63,13 @@
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
     </projectState>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
