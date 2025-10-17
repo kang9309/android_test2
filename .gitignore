@@ -7,6 +7,8 @@ hellojni/local.properties
 # /plugintemplate
 plugintemplate/app/build/
 plugintemplate/local.properties
+#test
+plugintemplate2/app/build/
 /sensortester
 /windconsumer
 /PluginTemplateLegacy
