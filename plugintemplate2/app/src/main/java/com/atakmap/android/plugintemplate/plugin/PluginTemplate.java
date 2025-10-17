@@ -4,6 +4,7 @@ package com.atakmap.android.plugintemplate.plugin;
 import android.content.Context;
 import android.widget.Button;
 import android.widget.Toast;
+import android.widget.EditText;
 import android.view.View;
 
 import com.atak.plugins.impl.PluginContextProvider;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.DatagramSocket;
 import java.nio.charset.StandardCharsets;
 
 import gov.tak.api.plugin.IPlugin;
@@ -35,6 +37,8 @@ public class PluginTemplate implements IPlugin {
     IHostUIService uiService;
     ToolbarItem toolbarItem;
     Pane templatePane;
+    final String MULTICAST_ADDRESS = "224.0.0.1";
+    final int MULTICAST_PORT = 6969; // ATAK에서 자주 사용하는 포트?
 
     public PluginTemplate(IServiceController serviceController) {
         this.serviceController = serviceController;
@@ -129,13 +133,42 @@ public class PluginTemplate implements IPlugin {
     private void setupViewInteractions(View pluginView) {
         try {
             Button send_multicastBTN = pluginView.findViewById(R.id.send_multicast);
+            Button send_multicastBTN2 = pluginView.findViewById(R.id.send_multicast2);
+            EditText editText = pluginView.findViewById(R.id.editText);
+            Button send_unicastBTN = pluginView.findViewById(R.id.send_unicast);
+
             if (send_multicastBTN != null) {
                 // 버튼 클릭 이벤트를 onPluginButtonClicked 메서드에 연결합니다.
                 send_multicastBTN.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Toast.makeText(pluginContext, "send_multicast", Toast.LENGTH_SHORT).show();
-                        sendCoTMulticast();
+                        sendCoTMsg("", true);
+                    }
+                });
+            }
+
+            if (send_multicastBTN2 != null) {
+                // 버튼 클릭 이벤트를 onPluginButtonClicked 메서드에 연결합니다.
+                send_multicastBTN2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String inputText = editText.getText().toString();
+                        Toast.makeText(pluginContext, inputText, Toast.LENGTH_SHORT).show();
+                        sendCoTMsg(inputText, true);
+                    }
+                });
+            }
+
+
+            if (send_unicastBTN != null) {
+                // 버튼 클릭 이벤트를 onPluginButtonClicked 메서드에 연결합니다.
+                send_unicastBTN.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String inputText = editText.getText().toString();
+                        Toast.makeText(pluginContext, inputText, Toast.LENGTH_SHORT).show();
+                        sendCoTMsg(inputText, false);
                     }
                 });
             }
@@ -146,50 +179,88 @@ public class PluginTemplate implements IPlugin {
         }
     }
 
-    public void sendCoTMulticast() {
+    public void sendCoTMsg(String targetIP, boolean multicast) {
+        String address;
+        if(!targetIP.isEmpty()) {
+            address = targetIP;
+        }
+        else {
+            address = MULTICAST_ADDRESS;
+        }
+
+        GeoPoint center = getSelfMarker();
+        if(center == null) return;
+        // 테스트를 위한 CoT XML 메시지 생성
+        String cotXml = String.format(
+                "<event version='2.0' type='a-h-G-U-T' uid='ATAK_Test_Multicast_%d' time='%s' start='%s' stale='%s' how='h-g'>" +
+                        "<point lat='%.6f' lon='%.6f' hae='0.0' ce='9999999.0' le='9999999.0'/>" +
+                        "</event>",
+                System.currentTimeMillis(),
+                "2025-01-01T00:00:00.000Z", // 실제 UTC 시간으로 포맷해야 합니다.
+                "2025-01-01T00:00:00.000Z",
+                "2025-01-01T00:00:10.000Z",
+                center.getLatitude(),
+                center.getLongitude()
+        );
+        Log.d(CLASS_TAG, LogUtils.getLogPosition() + "address : " + address);
+        if(multicast) {
+            sendCoTMulticast(address, cotXml);
+        }
+        else {
+            sendCoTUnicast(address, cotXml);
+        }
+    }
+    public void sendCoTMulticast(String targetIP, String cotXml) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final String MULTICAST_ADDRESS = "224.0.0.1";
-                final int MULTICAST_PORT = 6969; // ATAK에서 자주 사용하는 포트
-                Log.e(CLASS_TAG, LogUtils.getLogPosition() + "sendCoTMulticast.");
-
                 try {
-                    // 현재 지도 중심 좌표를 얻습니다.
-                    MapView mapView = MapView.getMapView();
-                    if (mapView == null) {
-                        Log.e(CLASS_TAG, LogUtils.getLogPosition() + "MapView is null, cannot send CoT event.");
-                        return;
-                    }
-
-                    // Chat CoT는 위치 정보가 중요하지 않지만, 기본 마커 정보는 필요합니다.
-                    GeoPoint center = mapView.getSelfMarker().getPoint();
-                    // 테스트를 위한 CoT XML 메시지 생성
-                    String cotXml = String.format(
-                            "<event version='2.0' type='a-h-G-U-T' uid='ATAK_Test_Multicast_%d' time='%s' start='%s' stale='%s' how='h-g'>" +
-                                    "<point lat='%.6f' lon='%.6f' hae='0.0' ce='9999999.0' le='9999999.0'/>" +
-                                    "</event>",
-                            System.currentTimeMillis(),
-                            "2025-01-01T00:00:00.000Z", // 실제 UTC 시간으로 포맷해야 합니다.
-                            "2025-01-01T00:00:00.000Z",
-                            "2025-01-01T00:00:10.000Z",
-                            center.getLatitude(),
-                            center.getLongitude()
-                    );
                     MulticastSocket socket = new MulticastSocket();
-                    InetAddress group = InetAddress.getByName(MULTICAST_ADDRESS);
+                    InetAddress group = InetAddress.getByName(targetIP);
                     byte[] buffer = cotXml.getBytes(StandardCharsets.UTF_8);
-
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, MULTICAST_PORT);
                     socket.send(packet);
                     socket.close();
 
-                    Log.d(CLASS_TAG, LogUtils.getLogPosition() + "CoT 멀티캐스트 전송 성공: " + center.toString());
+                    Log.d(CLASS_TAG, LogUtils.getLogPosition() + "CoT multicast 전송 성공");
 
                 } catch (IOException e) {
-                    Log.e(CLASS_TAG, LogUtils.getLogPosition() + "CoT 멀티캐스트 전송 오류", e);
+                    Log.e(CLASS_TAG, LogUtils.getLogPosition() + "CoT multicast 전송 오류", e);
                 }
             }
         }).start();
+    }
+
+    public void sendCoTUnicast(String targetIP, String cotXml) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    DatagramSocket socket = new DatagramSocket();
+                    InetAddress address = InetAddress.getByName(targetIP);
+                    byte[] buffer = cotXml.getBytes(StandardCharsets.UTF_8);
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, MULTICAST_PORT);
+                    socket.send(packet);
+                    socket.close();
+
+                    Log.d(CLASS_TAG, LogUtils.getLogPosition() + "CoT unicast 전송 성공");
+
+                } catch (IOException e) {
+                    Log.e(CLASS_TAG, LogUtils.getLogPosition() + "CoT unicast 전송 오류", e);
+                }
+            }
+        }).start();
+    }
+
+    public GeoPoint getSelfMarker() {
+        // 현재 지도 중심 좌표를 얻습니다.
+        MapView mapView = MapView.getMapView();
+        if (mapView == null) {
+            Log.e(CLASS_TAG, LogUtils.getLogPosition() + "MapView is null, cannot send CoT event.");
+            return null;
+        }
+        GeoPoint center = mapView.getSelfMarker().getPoint();
+        Log.d(CLASS_TAG, LogUtils.getLogPosition() + center.toString());
+        return center;
     }
 }
