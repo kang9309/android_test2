@@ -17,38 +17,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a0b706c-aa9c-4197-a0c0-0dbde59056ba" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../hellojni/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../hellojni/local.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/.gradle/8.13/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.gradle/8.13/executionHistory/executionHistory.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/.gradle/8.13/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.gradle/8.13/executionHistory/executionHistory.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/.gradle/8.13/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.gradle/8.13/fileHashes/fileHashes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/.gradle/8.13/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.gradle/8.13/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/.gradle/8.13/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.gradle/8.13/fileHashes/resourceHashesCache.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/build/reports/problems/problems-report.html" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/build/reports/problems/problems-report.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../helloworld/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../helloworld/local.properties" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../plugintemplate/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../plugintemplate/.gradle/8.13/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../plugintemplate/.gradle/8.13/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../plugintemplate/.gradle/8.13/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../plugintemplate/.gradle/8.13/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../plugintemplate/.gradle/8.13/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../plugintemplate/.gradle/8.13/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../plugintemplate/.gradle/8.13/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../plugintemplate/.gradle/8.13/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../plugintemplate/.gradle/8.13/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../plugintemplate/.gradle/8.13/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../plugintemplate/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../plugintemplate/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../plugintemplate/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/../plugintemplate/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../plugintemplate/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/../plugintemplate/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../plugintemplate/app/src/main/res/layout/main_layout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../plugintemplate/app/src/main/res/layout/main_layout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../plugintemplate/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../plugintemplate/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../plugintemplate/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../plugintemplate/local.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.13/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.13/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/atakmap/android/plugintemplate/plugin/PluginTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/atakmap/android/plugintemplate/plugin/PluginTemplate.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/main_layout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/main_layout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local.properties" beforeDir="false" afterPath="$PROJECT_DIR$/local.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,19 +77,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/ATAK_POC/ATAK/SDK/ATAK-CIV-5.5.0.7-SDK/ATAK-CIV-5.5.0.7-SDK/samples/plugintemplate2&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "E:/test/android2/ATAK-CIV-5.5.0.7-SDK/ATAK-CIV-5.5.0.7-SDK/samples/plugintemplate"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
       <module name="plugintemplate2.app" />
@@ -172,6 +165,7 @@
       </method>
     </configuration>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="9a0b706c-aa9c-4197-a0c0-0dbde59056ba" name="Changes" comment="" />
@@ -187,32 +181,32 @@
       <map>
         <entry key="com.atakmap.android.plugintemplate.plugin">
           <value>
-            <CheckInfo lastCheckTimestamp="1760663817102" />
+            <CheckInfo lastCheckTimestamp="1760891994784" />
           </value>
         </entry>
         <entry key="com.atakmap.android.plugintemplate.plugin.gov">
           <value>
-            <CheckInfo lastCheckTimestamp="1760663817119" />
+            <CheckInfo lastCheckTimestamp="1760891994754" />
           </value>
         </entry>
         <entry key="com.atakmap.android.plugintemplate.plugin.gov.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1760663817105" />
+            <CheckInfo lastCheckTimestamp="1760891994782" />
           </value>
         </entry>
         <entry key="com.atakmap.android.plugintemplate.plugin.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1760663817114" />
+            <CheckInfo lastCheckTimestamp="1760891994752" />
           </value>
         </entry>
         <entry key="com.atakmap.android.plugintemplate.plugin.xyz">
           <value>
-            <CheckInfo lastCheckTimestamp="1760663817117" />
+            <CheckInfo lastCheckTimestamp="1760891994758" />
           </value>
         </entry>
         <entry key="com.atakmap.android.plugintemplate.plugin.xyz.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1760663817126" />
+            <CheckInfo lastCheckTimestamp="1760891994759" />
           </value>
         </entry>
       </map>

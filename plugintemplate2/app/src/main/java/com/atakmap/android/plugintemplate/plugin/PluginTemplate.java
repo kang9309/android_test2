@@ -15,10 +15,17 @@ import com.atakmap.coremap.maps.coords.GeoPoint;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
+
+
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.DatagramSocket;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import java.text.SimpleDateFormat;
 
 import gov.tak.api.plugin.IPlugin;
 import gov.tak.api.plugin.IServiceController;
@@ -28,6 +35,8 @@ import gov.tak.api.ui.PaneBuilder;
 import gov.tak.api.ui.ToolbarItem;
 import gov.tak.api.ui.ToolbarItemAdapter;
 import gov.tak.platform.marshal.MarshalManager;
+
+
 
 
 public class PluginTemplate implements IPlugin {
@@ -202,6 +211,15 @@ public class PluginTemplate implements IPlugin {
                 center.getLatitude(),
                 center.getLongitude()
         );
+        //chat test
+//        final String SENDER_UID = "User_ATAK_Plugin_12345";
+//        final String SENDER_CALLSIGN = "ksh33";
+//        final String CHAT_ROOM_ID = "My_Op_Room_A"; // 전송할 채팅방 ID
+//        final String CHAT_MESSAGE = "ATAK 플러그인에서 보낸 테스트 채팅 메시지입니다.";
+//
+//        String cotXml = generateChatCot(SENDER_UID, SENDER_CALLSIGN, CHAT_ROOM_ID, CHAT_MESSAGE,
+//                center.getLatitude(), center.getLongitude());
+        //chat test
         Log.d(CLASS_TAG, LogUtils.getLogPosition() + "address : " + address);
         if(multicast) {
             sendCoTMulticast(address, cotXml);
@@ -250,6 +268,57 @@ public class PluginTemplate implements IPlugin {
                 }
             }
         }).start();
+    }
+
+
+    public String generateChatCot(String senderUid, String senderCallsign, String chatRoomId, String message, double lat, double lon) {
+        long nowTime = System.currentTimeMillis();
+        Date now = new Date(nowTime);
+        Date stale = new Date(nowTime + 30000); // 채팅 메시지는 일반적으로 30초 정도의 유효 기간을 갖습니다.
+
+        SimpleDateFormat COT_DATE_FORMAT;
+        COT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        COT_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        String timeStr = COT_DATE_FORMAT.format(now);
+        String staleStr = COT_DATE_FORMAT.format(stale);
+        String startStr = timeStr;
+
+        String messageUid = "CHAT_" + senderUid + "_" + nowTime;
+
+        Log.d(CLASS_TAG, LogUtils.getLogPosition() + "test");
+        // XML의 텍스트 콘텐츠(메시지)에 특수 문자가 포함될 경우를 대비해 CDATA 섹션을 사용하거나 XML 엔티티로 이스케이프해야 합니다.
+        // 여기서는 안전을 위해 간단한 메시지만 사용하거나, 실제 사용 시 라이브러리를 통해 적절히 처리해야 합니다.
+        String safeMessage = message;
+//                .replace("&", "&amp;")
+//                .replace("<", "&lt;")
+//                .replace(">", "&gt;");
+        Log.d(CLASS_TAG, LogUtils.getLogPosition() + "test");
+        String cotXml = String.format(
+                "<event version='2.0' type='b-t-r-u-c' uid='%s' time='%s' start='%s' stale='%s' how='h-g'>" +
+                        "<point lat='%.6f' lon='%.6f' hae='0.0' ce='9999999.0' le='9999999.0'/>" +
+                        "<detail>" +
+                        "<chat id='%s' chatroom='%s' parent='%s' groupOwner='true'>" +
+                        "<entry uid='%s' callsign='%s'/>" +
+                        "</chat>" +
+                        "<remarks>%s</remarks>" +
+                        "</detail>" +
+                        "</event>",
+                messageUid,
+                timeStr,
+                startStr,
+                staleStr,
+                lat,
+                lon,
+                chatRoomId, // [7] chat id (OK)
+                chatRoomId, // [8] chatroom (OK)
+                senderUid,  // [9] parent (OK: sender UID로 설정)
+                senderUid,  // [10] entry uid (수정: 원래 senderCallsign이었으나, uid가 맞음)
+                senderCallsign, // [11] entry callsign (수정: 원래 safeMessage였으나, callsign이 맞음)
+                safeMessage // [12] remarks (추가: 원래 누락되었던 인자)
+        );
+        Log.d(CLASS_TAG, LogUtils.getLogPosition() + "test");
+        return cotXml;
     }
 
     public GeoPoint getSelfMarker() {
