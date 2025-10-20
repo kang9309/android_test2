@@ -1,0 +1,13 @@
+//다른 앱에서 좌표이동
+private String S23Nmae = "ANDROID-4ae2d946ebba7b8d";
+private String S20Nmae = "ANDROID-2d84735daeafa895";
+
+echo "<event version='2.0' type='b-t-r-u-c' uid='ANDROID-4ae2d946ebba7b8d' time='2025-10-20T04:36:20.691Z' start='2025-10-20T04:36:20.691Z' stale='2025-10-20T04:36:50.691Z' how='h-g'>
+    <point lat='25.168572' lon='-2.046596' hae='0.0' ce='9999999.0' le='9999999.0' />
+    <detail>
+	<chat id='ANDROID-2d84735daeafa895' chatroom='ANDROID-2d84735daeafa895' parent='ANDROID-4ae2d946ebba7b8d' groupOwner='true'>
+   	     <entry uid='ANDROID-4ae2d946ebba7b8d' callsign='ksh33' />
+        </chat>
+	<remarks>ATAK test</remarks>
+    </detail>
+</event>" | nc -u 224.0.0.1 6969
