@@ -14,13 +14,16 @@ import com.atakmap.android.maps.MapView;
 import com.atakmap.coremap.log.Log;
 import com.atakmap.coremap.maps.coords.GeoPoint;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
+import java.io.*;
+//import java.io.IOException;
 
-
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.DatagramSocket;
+import java.net.*;
+//import java.net.DatagramPacket;
+//
+//
+//import java.net.InetAddress;
+//import java.net.MulticastSocket;
+//import java.net.DatagramSocket;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Locale;
@@ -225,11 +228,16 @@ public class PluginTemplate implements IPlugin {
         final String SENDER_UID = "ANDROID-4ae2d946ebba7b8d";
         final String SENDER_CALLSIGN = "ksh33";
         final String CHAT_ROOM_ID = "ANDROID-2d84735daeafa895"; // 전송할 채팅방 ID
-        final String CHAT_MESSAGE = "22 ATAK 플러그인에서 보낸 테스트 채팅 메시지입니다.";
+        final String CHAT_MESSAGE = "테스트 CHAT_MESSAGE";
 
         if(test) {
             cotXml = generateChatCot(SENDER_UID, SENDER_CALLSIGN, CHAT_ROOM_ID, CHAT_MESSAGE,
                     center.getLatitude(), center.getLongitude());
+//            CheckBox checkBox = g_View.findViewById(R.id.ckbMulticastPort);
+//            int port = checkBox.isChecked() ? MULTICAST_PORT : UNICAST_PORT;
+//            cotXml = generateChatCot3(SENDER_UID, SENDER_CALLSIGN, CHAT_ROOM_ID, CHAT_MESSAGE,
+//                    center.getLatitude(), center.getLongitude(),
+//                    address + ":" + port);
         }
 
         //chat test
@@ -336,6 +344,102 @@ public class PluginTemplate implements IPlugin {
         return cotXml;
     }
 
+    public String generateChatCot2(String senderUid, String senderCallsign, String chatRoomId, String message, double lat, double lon, String address) {
+        long nowTime = System.currentTimeMillis();
+        Date now = new Date(nowTime);
+        Date stale = new Date(nowTime + 30000); // 채팅 메시지는 일반적으로 30초 정도의 유효 기간을 갖습니다.
+
+        SimpleDateFormat COT_DATE_FORMAT;
+        COT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        COT_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        String timeStr = COT_DATE_FORMAT.format(now);
+        String staleStr = COT_DATE_FORMAT.format(stale);
+        String startStr = timeStr;
+
+        String messageUid = //senderUid + "_" + nowTime;
+                senderUid;
+
+        // XML의 텍스트 콘텐츠(메시지)에 특수 문자가 포함될 경우를 대비해 CDATA 섹션을 사용하거나 XML 엔티티로 이스케이프해야 합니다.
+        // 여기서는 안전을 위해 간단한 메시지만 사용하거나, 실제 사용 시 라이브러리를 통해 적절히 처리해야 합니다.
+        String safeMessage = message;
+//                .replace("&", "&amp;")
+//                .replace("<", "&lt;")
+//                .replace(">", "&gt;");
+        String cotXml = String.format(
+                "<event version='2.0' uid='GeoChat.%s.ksh.%s' type='b-t-f' time='%s' start='%s' stale='%s' how='h-g-i-g-o'>" +
+                    "<point lat='%s' lon='%s' hae='HAE' ce='CE' le='LE' />" +
+                    "<detail>" +
+                        "<__chat id='%s' chatroom='ksh'>" +
+                            "<chatgrp id='%s' uid0='%s' uid1='%s' />" +
+                        "</__chat>" +
+                        "<link relation='p-p' uid='%s' type='a-f-G-U-C' />" +
+                        "<remarks time='%s' source='ksh33.%s' to='%s'>Roger</remarks>" +
+                        "<__serverdestination destinations='%s:udp:%s' />" +
+                    "</detail>" +
+                "</event>",
+            senderUid, chatRoomId, timeStr, startStr, staleStr,//event
+            lat, lon, //point
+            chatRoomId, //__chat id
+            chatRoomId, senderUid, chatRoomId, //chatgrp id
+            senderUid, //link relation
+            timeStr, senderUid, chatRoomId, //remarks time
+            address, senderUid //__serverdestination
+        );
+        Log.d(CLASS_TAG, LogUtils.getLogPosition() + cotXml);
+        return cotXml;
+    }
+
+//    public String generateChatCot3(String senderUid, String senderCallsign, String chatRoomId, String message, double lat, double lon, String address) {
+//        long nowTime = System.currentTimeMillis();
+//        Date now = new Date(nowTime);
+//        Date stale = new Date(nowTime + 30000); // 채팅 메시지는 일반적으로 30초 정도의 유효 기간을 갖습니다.
+//
+//        SimpleDateFormat COT_DATE_FORMAT;
+//        COT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+//        COT_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+//
+//        String timeStr = COT_DATE_FORMAT.format(now);
+//        String staleStr = COT_DATE_FORMAT.format(stale);
+//        String startStr = timeStr;
+//
+//        String messageUid = //senderUid + "_" + nowTime;
+//                senderUid;
+//
+//        // XML의 텍스트 콘텐츠(메시지)에 특수 문자가 포함될 경우를 대비해 CDATA 섹션을 사용하거나 XML 엔티티로 이스케이프해야 합니다.
+//        // 여기서는 안전을 위해 간단한 메시지만 사용하거나, 실제 사용 시 라이브러리를 통해 적절히 처리해야 합니다.
+//        String safeMessage = message;
+////                .replace("&", "&amp;")
+////                .replace("<", "&lt;")
+////                .replace(">", "&gt;");
+//        String cotXml = String.format(
+//                "<event version="2.0"
+//        uid="GeoChat.myDeviceID"
+//        type="b-t-f"
+//        time="2025-10-20T06:00:00Z"
+//        start="2025-10-20T06:00:00Z"
+//        stale="2025-10-20T06:01:00Z"
+//        how="m-g">
+//                <point lat="37.5665" lon="126.9780" hae="0" ce="9999999" le="9999999"/>
+//                <detail>
+//                <__chat>
+//                <chatgrp uid0="MY_DEVICE_UID" id="MyChatRoom"/>
+//                <chatmsg senderCallsign="Shin" chatroom="MyChatRoom">Hello from CoT!</chatmsg>
+//                </__chat>
+//                </detail>
+//                </event>",
+//                senderUid, chatRoomId, timeStr, startStr, staleStr,//event
+//                lat, lon, //point
+//                chatRoomId, //__chat id
+//                chatRoomId, senderUid, chatRoomId, //chatgrp id
+//                senderUid, //link relation
+//                timeStr, senderUid, chatRoomId, //remarks time
+//                address, senderUid //__serverdestination
+//        );
+//        Log.d(CLASS_TAG, LogUtils.getLogPosition() + cotXml);
+//        return cotXml;
+//    }
+//
     public GeoPoint getSelfMarker() {
         // 현재 지도 중심 좌표를 얻습니다.
         MapView mapView = MapView.getMapView();
