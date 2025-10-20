@@ -5,6 +5,7 @@ import android.content.Context;
 import android.widget.Button;
 import android.widget.Toast;
 import android.widget.EditText;
+import android.widget.CheckBox;
 import android.view.View;
 
 import com.atak.plugins.impl.PluginContextProvider;
@@ -48,6 +49,12 @@ public class PluginTemplate implements IPlugin {
     Pane templatePane;
     final String MULTICAST_ADDRESS = "224.0.0.1";
     final int MULTICAST_PORT = 6969; // ATAK에서 자주 사용하는 포트?
+    final int UNICAST_PORT = 42001;//?
+
+    View g_View = null;
+
+    private String S23Nmae = "ANDROID-4ae2d946ebba7b8d";
+    private String S20Nmae = "ANDROID-2d84735daeafa895";
 
     public PluginTemplate(IServiceController serviceController) {
         this.serviceController = serviceController;
@@ -111,6 +118,7 @@ public class PluginTemplate implements IPlugin {
                     R.layout.main_layout, null);
             // 2. 인플레이트된 View 내부의 버튼 클릭 리스너를 설정합니다. (View 상호작용 준비)
             setupViewInteractions(pluginView);
+            g_View = pluginView;
 
             // Remember to use the PluginLayoutInflator if you are actually inflating a custom view
             // In this case, using it is not necessary - but I am putting it here to remind
@@ -152,7 +160,7 @@ public class PluginTemplate implements IPlugin {
                     @Override
                     public void onClick(View v) {
                         Toast.makeText(pluginContext, "send_multicast", Toast.LENGTH_SHORT).show();
-                        sendCoTMsg("", true);
+                        sendCoTMsg("", true, false);
                     }
                 });
             }
@@ -164,7 +172,8 @@ public class PluginTemplate implements IPlugin {
                     public void onClick(View v) {
                         String inputText = editText.getText().toString();
                         Toast.makeText(pluginContext, inputText, Toast.LENGTH_SHORT).show();
-                        sendCoTMsg(inputText, true);
+//                        sendCoTMsg(inputText, true, false);
+                        sendCoTMsg(inputText, false, true);
                     }
                 });
             }
@@ -177,7 +186,7 @@ public class PluginTemplate implements IPlugin {
                     public void onClick(View v) {
                         String inputText = editText.getText().toString();
                         Toast.makeText(pluginContext, inputText, Toast.LENGTH_SHORT).show();
-                        sendCoTMsg(inputText, false);
+                        sendCoTMsg(inputText, false, false);
                     }
                 });
             }
@@ -188,7 +197,7 @@ public class PluginTemplate implements IPlugin {
         }
     }
 
-    public void sendCoTMsg(String targetIP, boolean multicast) {
+    public void sendCoTMsg(String targetIP, boolean multicast, boolean test) {
         String address;
         if(!targetIP.isEmpty()) {
             address = targetIP;
@@ -200,7 +209,8 @@ public class PluginTemplate implements IPlugin {
         GeoPoint center = getSelfMarker();
         if(center == null) return;
         // 테스트를 위한 CoT XML 메시지 생성
-        String cotXml = String.format(
+        String cotXml;
+        cotXml = String.format(
                 "<event version='2.0' type='a-h-G-U-T' uid='ATAK_Test_Multicast_%d' time='%s' start='%s' stale='%s' how='h-g'>" +
                         "<point lat='%.6f' lon='%.6f' hae='0.0' ce='9999999.0' le='9999999.0'/>" +
                         "</event>",
@@ -212,13 +222,16 @@ public class PluginTemplate implements IPlugin {
                 center.getLongitude()
         );
         //chat test
-//        final String SENDER_UID = "User_ATAK_Plugin_12345";
-//        final String SENDER_CALLSIGN = "ksh33";
-//        final String CHAT_ROOM_ID = "My_Op_Room_A"; // 전송할 채팅방 ID
-//        final String CHAT_MESSAGE = "ATAK 플러그인에서 보낸 테스트 채팅 메시지입니다.";
-//
-//        String cotXml = generateChatCot(SENDER_UID, SENDER_CALLSIGN, CHAT_ROOM_ID, CHAT_MESSAGE,
-//                center.getLatitude(), center.getLongitude());
+        final String SENDER_UID = "ANDROID-4ae2d946ebba7b8d";
+        final String SENDER_CALLSIGN = "ksh33";
+        final String CHAT_ROOM_ID = "ANDROID-2d84735daeafa895"; // 전송할 채팅방 ID
+        final String CHAT_MESSAGE = "22 ATAK 플러그인에서 보낸 테스트 채팅 메시지입니다.";
+
+        if(test) {
+            cotXml = generateChatCot(SENDER_UID, SENDER_CALLSIGN, CHAT_ROOM_ID, CHAT_MESSAGE,
+                    center.getLatitude(), center.getLongitude());
+        }
+
         //chat test
         Log.d(CLASS_TAG, LogUtils.getLogPosition() + "address : " + address);
         if(multicast) {
@@ -257,11 +270,14 @@ public class PluginTemplate implements IPlugin {
                     DatagramSocket socket = new DatagramSocket();
                     InetAddress address = InetAddress.getByName(targetIP);
                     byte[] buffer = cotXml.getBytes(StandardCharsets.UTF_8);
-                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, MULTICAST_PORT);
+                    CheckBox checkBox = g_View.findViewById(R.id.ckbMulticastPort);
+                    int port = checkBox.isChecked() ? MULTICAST_PORT : UNICAST_PORT;
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, port);
+                    //unicast 포트사용시 수신이 안됨?
                     socket.send(packet);
                     socket.close();
 
-                    Log.d(CLASS_TAG, LogUtils.getLogPosition() + "CoT unicast 전송 성공");
+                    Log.d(CLASS_TAG, LogUtils.getLogPosition() + "CoT unicast 전송 성공 port:" + port);
 
                 } catch (IOException e) {
                     Log.e(CLASS_TAG, LogUtils.getLogPosition() + "CoT unicast 전송 오류", e);
@@ -284,16 +300,15 @@ public class PluginTemplate implements IPlugin {
         String staleStr = COT_DATE_FORMAT.format(stale);
         String startStr = timeStr;
 
-        String messageUid = "CHAT_" + senderUid + "_" + nowTime;
+        String messageUid = //senderUid + "_" + nowTime;
+                            senderUid;
 
-        Log.d(CLASS_TAG, LogUtils.getLogPosition() + "test");
         // XML의 텍스트 콘텐츠(메시지)에 특수 문자가 포함될 경우를 대비해 CDATA 섹션을 사용하거나 XML 엔티티로 이스케이프해야 합니다.
         // 여기서는 안전을 위해 간단한 메시지만 사용하거나, 실제 사용 시 라이브러리를 통해 적절히 처리해야 합니다.
         String safeMessage = message;
 //                .replace("&", "&amp;")
 //                .replace("<", "&lt;")
 //                .replace(">", "&gt;");
-        Log.d(CLASS_TAG, LogUtils.getLogPosition() + "test");
         String cotXml = String.format(
                 "<event version='2.0' type='b-t-r-u-c' uid='%s' time='%s' start='%s' stale='%s' how='h-g'>" +
                         "<point lat='%.6f' lon='%.6f' hae='0.0' ce='9999999.0' le='9999999.0'/>" +

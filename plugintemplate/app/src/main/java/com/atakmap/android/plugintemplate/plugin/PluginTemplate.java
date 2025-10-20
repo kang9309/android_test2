@@ -28,8 +28,13 @@ public class PluginTemplate implements IPlugin {
 
     private MulticastReceiver multicastReceiver = null;
     private Thread multicastReceiverThread = null;
+
+    private UnicastReceiver unicastReceiver = null;
+    private Thread unicastReceiverThread = null;
+
     private static final String MULTICAST_ADDRESS = "224.0.0.1";
     private static final int MULTICAST_PORT = 6969;
+    private static final int UNICAST_PORT = 42001;
 
 
     public PluginTemplate(IServiceController serviceController) {
@@ -80,6 +85,16 @@ public class PluginTemplate implements IPlugin {
             Log.d(CLASS_TAG, "Multicast Receiver Thread started: " + MULTICAST_ADDRESS + ":" + MULTICAST_PORT);
         } catch (Exception e) {
             Log.e(CLASS_TAG, "Failed to start Multicast Receiver Thread", e);
+        }
+
+        // [네트워크 테스트] unicastReceiver 시작
+        try {
+            unicastReceiver = new UnicastReceiver(UNICAST_PORT);
+            unicastReceiverThread = new Thread(unicastReceiver, "UnicastReceiverThread");
+            unicastReceiverThread.start();
+            Log.d(CLASS_TAG, "Unicast Receiver Thread started: " + UNICAST_PORT);
+        } catch (Exception e) {
+            Log.e(CLASS_TAG, "Failed to start Unicast Receiver Thread", e);
         }
     }
 
